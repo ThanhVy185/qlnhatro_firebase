@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "599382493245",
+    "project_id": "cnpm-103d1",
+    "storage_bucket": "cnpm-103d1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599382493245:android:d9ee2e2c63578fa8e90254",
+        "android_client_info": {
+          "package_name": "com.huflit.qlnhatro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbdNkr359RTijcHygMX-IUIFVvxV088AQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
