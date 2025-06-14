@@ -15,19 +15,19 @@
         android:theme="@style/Theme.Qlnhatro"
         tools:targetApi="31">
         <activity
-            android:name=".PhongAdapter"
+            android:name=".TenantAdapter"
             android:exported="false" />
         <activity
-            android:name=".FunctionAdapter"
+            android:name=".Tenant"
             android:exported="false" />
         <activity
-            android:name=".QuanlyActivity"
+            android:name=".Room"
             android:exported="false" />
         <activity
-            android:name=".PhongTroAdapter"
-            android:exported="false" />
+            android:name=".RoomAdapter"
+            android:exported="false" /> <!-- RoomManagementActivity bây giờ là Launcher -->
         <activity
-            android:name=".TestActivity"
+            android:name=".RoomManagementActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,6 +35,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".TenantManagementActivity"
+            android:exported="false" /> <!-- TestActivity không còn launcher -->
+        <activity
+            android:name=".TestActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

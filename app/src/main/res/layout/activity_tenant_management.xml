@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- nút navigation -->
+        <include layout="@layout/include_top_navigation"/>
+
+        <!-- nội dung thêm người thuê -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/etTenantName"
+                android:hint="Tên người thuê"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
+
+            <EditText
+                android:id="@+id/etTenantPhone"
+                android:hint="Số điện thoại"
+                android:inputType="phone"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerRooms"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/btnSaveTenant"
+                android:text="Thêm người thuê"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="130dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#79D57A"/>
+        </LinearLayout>
+        <!-- RecyclerView hiển thị danh sách người thuê -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTenants"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_weight="1"
+            android:padding="8dp"/>
+    </LinearLayout>
+</ScrollView>
