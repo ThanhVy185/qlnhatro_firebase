@@ -19,23 +19,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class PhongActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_phong);
+        setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+
+
         });
         // Create a new user with a first and last name
         Map<String, Object> phong = new HashMap<>();
         phong.put("tenPhong", "Phòng 101");
         phong.put("gia", 1500000);
         phong.put("trangThai", "Trống");
+
+        phong.put("tenPhong", "Phòng 102");
+        phong.put("gia", 1500000);
+        phong.put("trangThai", "Full");
+        phong.put("tenPhong", "Phòng 103");
+        phong.put("gia", 1500000);
+        phong.put("trangThai", "Trống");
+
 
 // Add a new document with a generated ID
         FirebaseFirestore db = FirebaseFirestore.getInstance();
