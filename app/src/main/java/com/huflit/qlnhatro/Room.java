@@ -4,16 +4,22 @@ public class Room {
     private String id;
     private String number;
     private String name;
+    private int maxOccupancy;
 
-    public Room() {}  // required for Firestore
+    // Firestore cần constructor không args
+    public Room() {}
 
-    public Room(String id, String number, String name) {
+    // Constructor mới với maxOccupancy
+    public Room(String id, String number, String name, int maxOccupancy) {
         this.id = id;
         this.number = number;
         this.name = name;
+        this.maxOccupancy = maxOccupancy;
     }
 
-    public String getId() { return id; }
-    public String getNumber() { return number; }
-    public String getName() { return name; }
+    // getters
+    public String getId()            { return id; }
+    public String getNumber()        { return number; }
+    public String getName()          { return name; }
+    public int    getMaxOccupancy()  { return maxOccupancy; }
 }

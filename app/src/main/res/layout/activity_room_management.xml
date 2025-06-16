@@ -28,6 +28,15 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"/>
 
+        <EditText
+            android:id="@+id/etMaxOccupancy"
+            android:hint="Số lượng tối đa (người)"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"/>
+
+
         <Button
             android:id="@+id/btnSaveRoom"
             android:text="Thêm phòng"
