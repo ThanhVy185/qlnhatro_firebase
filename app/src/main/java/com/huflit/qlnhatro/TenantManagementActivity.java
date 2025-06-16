@@ -35,9 +35,9 @@ public class TenantManagementActivity extends AppCompatActivity {
     // Room data
     private List<String> roomNames = new ArrayList<>();
     private List<String> roomIds   = new ArrayList<>();
-    private Map<String, String> roomNumberMap     = new HashMap<>();
     private Map<String, Integer> roomMaxMap        = new HashMap<>();
     private Map<String, Integer> roomCurrentCount = new HashMap<>();
+    private Map<String, String> roomNumberMap      = new HashMap<>();
 
     // Tenant data
     private List<Tenant> tenantList = new ArrayList<>();
@@ -60,7 +60,7 @@ public class TenantManagementActivity extends AppCompatActivity {
         btnGoTenants  = findViewById(R.id.btnGoTenants);
         rvTenants     = findViewById(R.id.rvTenants);
 
-        // Navigation buttons
+        // Navigation
         btnGoTenants.setEnabled(false);
         btnGoRooms.setOnClickListener(v -> startActivity(new Intent(this, RoomManagementActivity.class)));
 
@@ -72,131 +72,146 @@ public class TenantManagementActivity extends AppCompatActivity {
         rvTenants.setLayoutManager(new LinearLayoutManager(this));
         rvTenants.setAdapter(adapter);
 
-        // Load rooms to spinner and tenants list
+        // Load initial data
         loadRooms();
         loadTenants();
 
-        // Add tenant click
-        btnSaveTenant.setOnClickListener(v -> {
-            String name  = etTenantName.getText().toString().trim();
-            String phone = etTenantPhone.getText().toString().trim();
-            int pos       = spinnerRooms.getSelectedItemPosition();
-            if (name.isEmpty() || phone.isEmpty() || pos < 0) {
-                Toast.makeText(this, "Nhập đủ thông tin và chọn phòng", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String roomId  = roomIds.get(pos);
-            int current    = roomCurrentCount.get(roomId);
-            int maxOcc     = roomMaxMap.get(roomId);
-            if (current >= maxOcc) {
-                Toast.makeText(this, "Phòng đã full", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String roomNum = roomNumberMap.get(roomId);
-            Map<String,Object> data = new HashMap<>();
-            data.put("name", name);
-            data.put("phone", phone);
-            data.put("roomId", roomId);
-            data.put("roomNumber", roomNum);
-            data.put("createdAt", System.currentTimeMillis());
-            db.collection("tenants").add(data)
-                    .addOnSuccessListener(doc -> {
-                        Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                        etTenantName.setText(""); etTenantPhone.setText("");
-                        loadRooms(); loadTenants();
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi thêm: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-        });
+        btnSaveTenant.setOnClickListener(v -> addTenant());
     }
 
-    // Load rooms, count tenants per room, setup spinner
+    private void addTenant() {
+        String name  = etTenantName.getText().toString().trim();
+        String phone = etTenantPhone.getText().toString().trim();
+        int pos = spinnerRooms.getSelectedItemPosition();
+        if (name.isEmpty() || phone.isEmpty() || pos < 0) {
+            Toast.makeText(this, "Nhập đủ thông tin và chọn phòng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String roomId = roomIds.get(pos);
+        int current   = roomCurrentCount.get(roomId);
+        int maxOcc    = roomMaxMap.get(roomId);
+        if (current >= maxOcc) {
+            Toast.makeText(this, "Phòng đã full", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String roomNum = roomNumberMap.get(roomId);
+
+        Map<String,Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("phone", phone);
+        data.put("roomId", roomId);
+        data.put("roomNumber", roomNum);
+        data.put("createdAt", System.currentTimeMillis());
+
+        db.collection("tenants").add(data)
+                .addOnSuccessListener(doc -> {
+                    etTenantName.setText("");
+                    etTenantPhone.setText("");
+                    loadRooms();
+                    loadTenants();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi khi thêm: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
     private void loadRooms() {
         db.collection("rooms").orderBy("createdAt").get()
                 .addOnSuccessListener(roomsSnap -> {
-                    roomNames.clear(); roomIds.clear(); roomNumberMap.clear();
-                    roomMaxMap.clear(); roomCurrentCount.clear();
+                    roomNames.clear(); roomIds.clear();
+                    roomMaxMap.clear(); roomCurrentCount.clear(); roomNumberMap.clear();
                     for (QueryDocumentSnapshot doc: roomsSnap) {
                         String id = doc.getId();
                         String num = doc.getString("number");
-                        int max = doc.contains("maxOccupancy") ? doc.getLong("maxOccupancy").intValue() : 0;
-                        roomIds.add(id); roomNumberMap.put(id,num);
-                        roomMaxMap.put(id,max); roomCurrentCount.put(id,0);
+                        int maxOcc = doc.contains("maxOccupancy") ? doc.getLong("maxOccupancy").intValue() : 0;
+                        roomIds.add(id);
+                        roomNumberMap.put(id, num);
+                        roomMaxMap.put(id, maxOcc);
+                        roomCurrentCount.put(id, 0);
                     }
-                    // count existing tenants
-                    db.collection("tenants").get().addOnSuccessListener(tSnap -> {
-                        for (QueryDocumentSnapshot t: tSnap) {
+                    // count tenants
+                    db.collection("tenants").get().addOnSuccessListener(ts -> {
+                        for (QueryDocumentSnapshot t: ts) {
                             String rid = t.getString("roomId");
                             if (roomCurrentCount.containsKey(rid)) {
-                                roomCurrentCount.put(rid, roomCurrentCount.get(rid)+1);
+                                roomCurrentCount.put(rid, roomCurrentCount.get(rid) + 1);
                             }
                         }
-                        // prepare display list
-                        List<String> disp = new ArrayList<>(); final List<Boolean> isFull=new ArrayList<>();
+                        List<String> display = new ArrayList<>(); List<Boolean> isFull = new ArrayList<>();
                         for (String id: roomIds) {
                             int cur = roomCurrentCount.get(id), max=roomMaxMap.get(id);
-                            String num=roomNumberMap.get(id);
-                            if (cur>=max) { disp.add(num+" (Full)"); isFull.add(true); }
-                            else { disp.add(num+" (Còn " + (max-cur) + " slot)"); isFull.add(false);}
+                            String num = roomNumberMap.get(id);
+                            if (cur >= max) {
+                                display.add(num + " (Full)"); isFull.add(true);
+                            } else {
+                                display.add(num + " (Còn " + (max - cur) + " slot)"); isFull.add(false);
+                            }
                         }
-                        ArrayAdapter<String> spAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,disp){
-                            @Override public boolean isEnabled(int pos){return !isFull.get(pos);}
-                            @Override public View getDropDownView(int pos,View v,ViewGroup p){
-                                TextView tv=(TextView)super.getDropDownView(pos,v,p);
-                                tv.setTextColor(isFull.get(pos)?Color.GRAY:Color.BLACK);return tv;} };
+                        ArrayAdapter<String> spAdapter = new ArrayAdapter<String>(
+                                this, android.R.layout.simple_spinner_item, display) {
+                            @Override public boolean isEnabled(int pos) { return !isFull.get(pos); }
+                            @Override public View getDropDownView(int pos, View cv, ViewGroup p) {
+                                TextView tv = (TextView) super.getDropDownView(pos, cv, p);
+                                tv.setTextColor(isFull.get(pos)?Color.GRAY:Color.BLACK);
+                                return tv;
+                            }
+                        };
                         spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinnerRooms.setAdapter(spAdapter);
                     });
-                }).addOnFailureListener(e-> Toast.makeText(this,"Lỗi load rooms",Toast.LENGTH_SHORT).show());
+                }).addOnFailureListener(e ->
+                        Toast.makeText(this, "Không load được phòng", Toast.LENGTH_SHORT).show()
+                );
     }
 
-    // Load tenants and refresh RecyclerView
     private void loadTenants() {
         db.collection("tenants").orderBy("createdAt").get()
-                .addOnSuccessListener(qs->{
+                .addOnSuccessListener(qSnap -> {
                     tenantList.clear();
-                    for (QueryDocumentSnapshot doc: qs) {
-                        String id=doc.getId(),
-                                name=doc.getString("name"),
-                                phone=doc.getString("phone"),
-                                rid=doc.getString("roomId"),
-                                num=doc.getString("roomNumber");
-                        tenantList.add(new Tenant(id,name,phone,rid,num));
+                    for (QueryDocumentSnapshot doc: qSnap) {
+                        tenantList.add(new Tenant(
+                                doc.getId(),
+                                doc.getString("name"),
+                                doc.getString("phone"),
+                                doc.getString("roomId"),
+                                doc.getString("roomNumber")
+                        ));
                     }
                     adapter.notifyDataSetChanged();
-                }).addOnFailureListener(e-> Toast.makeText(this,"Lỗi load tenants",Toast.LENGTH_SHORT).show());
+                }).addOnFailureListener(e ->
+                        Toast.makeText(this, "Không load được tenant", Toast.LENGTH_SHORT).show()
+                );
     }
 
-    // Edit dialog
     private void showEditTenantDialog(Tenant t) {
-        View v = getLayoutInflater().inflate(R.layout.dialog_edit_tenant,null);
-        EditText etName=v.findViewById(R.id.etEditTenantName),
-                etPhone=v.findViewById(R.id.etEditTenantPhone);
-        Spinner sp=v.findViewById(R.id.spEditRooms);
-        etName.setText(t.getName());etPhone.setText(t.getPhone());
-        loadRooms(); sp.post(()->{
-            int idx=roomIds.indexOf(t.getRoomId()); if(idx>=0)sp.setSelection(idx);
+        View v = getLayoutInflater().inflate(R.layout.dialog_edit_tenant, null);
+        EditText etName = v.findViewById(R.id.etEditTenantName);
+        EditText etPhone= v.findViewById(R.id.etEditTenantPhone);
+        Spinner sp      = v.findViewById(R.id.spEditRooms);
+        etName.setText(t.getName()); etPhone.setText(t.getPhone());
+        loadRooms(); sp.post(() -> {
+            int idx = roomIds.indexOf(t.getRoomId()); if (idx>=0) sp.setSelection(idx);
         });
-        new AlertDialog.Builder(this)
-                .setTitle("Sửa người thuê").setView(v)
-                .setPositiveButton("Lưu",(d,w)->{
-                    String nn=etName.getText().toString().trim();
-                    String np=etPhone.getText().toString().trim();
-                    int pos=sp.getSelectedItemPosition();
-                    if(nn.isEmpty()||np.isEmpty()||pos<0){Toast.makeText(this,"Nhập đủ info",Toast.LENGTH_SHORT).show();return;}
-                    String newRid=roomIds.get(pos), newNum=roomNumberMap.get(newRid);
-                    Map<String,Object> m=new HashMap<>(); m.put("name",nn); m.put("phone",np);
-                    m.put("roomId",newRid); m.put("roomNumber",newNum);
-                    db.collection("tenants").document(t.getId()).update(m)
-                            .addOnSuccessListener(a->{loadRooms();loadTenants();})
+        new AlertDialog.Builder(this).setTitle("Sửa người thuê").setView(v)
+                .setPositiveButton("Lưu", (d,w)->{
+                    String nn = etName.getText().toString().trim();
+                    String np = etPhone.getText().toString().trim();
+                    int pos = sp.getSelectedItemPosition();
+                    if (nn.isEmpty()||np.isEmpty()||pos<0) return;
+                    String newRid = roomIds.get(pos); String newNum=roomNumberMap.get(newRid);
+                    Map<String,Object> u = new HashMap<>();
+                    u.put("name", nn); u.put("phone", np);
+                    u.put("roomId", newRid); u.put("roomNumber", newNum);
+                    db.collection("tenants").document(t.getId()).update(u)
+                            .addOnSuccessListener(a->{ loadRooms(); loadTenants(); })
                             .addOnFailureListener(e->Toast.makeText(this,"Lỗi update",Toast.LENGTH_SHORT).show());
                 }).setNegativeButton("Hủy",null).show();
     }
 
-    // Delete dialog
     private void deleteTenant(Tenant t) {
         new AlertDialog.Builder(this)
-                .setTitle("Xóa người thuê").setMessage("Xóa " + t.getName() + " ?")
-                .setPositiveButton("Xóa",(d,w)->{
+                .setTitle("Xóa người thuê").setMessage("Xóa " + t.getName() + "?")
+                .setPositiveButton("Xóa", (d,w)->{
                     db.collection("tenants").document(t.getId()).delete()
                             .addOnSuccessListener(a->loadTenants())
                             .addOnFailureListener(e->Toast.makeText(this,"Lỗi xóa",Toast.LENGTH_SHORT).show());
