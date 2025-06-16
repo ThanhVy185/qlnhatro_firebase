@@ -15,8 +15,8 @@ public class TenantAdapter extends RecyclerView.Adapter<TenantAdapter.TenantView
         void onDelete(Tenant t);
     }
 
-    private List<Tenant> tenants;
-    private OnItemActionListener listener;
+    private final List<Tenant> tenants;
+    private final OnItemActionListener listener;
 
     public TenantAdapter(List<Tenant> tenants, OnItemActionListener listener) {
         this.tenants = tenants;
@@ -31,20 +31,25 @@ public class TenantAdapter extends RecyclerView.Adapter<TenantAdapter.TenantView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TenantViewHolder h, int pos) {
-        Tenant t = tenants.get(pos);
-        h.tvName.setText(t.getName());
-        h.tvPhone.setText("☎ " + t.getPhone());
-        h.btnEdit.setOnClickListener(v -> listener.onEdit(t));
-        h.btnDelete.setOnClickListener(v -> listener.onDelete(t));
+    public void onBindViewHolder(@NonNull TenantViewHolder holder, int position) {
+        Tenant tenant = tenants.get(position);
+        holder.tvName.setText(tenant.getName());
+        // Hiển thị số điện thoại và phòng
+        holder.tvPhone.setText("☎ " + tenant.getPhone() + "   Phòng: " + tenant.getRoomNumber());
+        holder.btnEdit.setOnClickListener(v -> listener.onEdit(tenant));
+        holder.btnDelete.setOnClickListener(v -> listener.onDelete(tenant));
     }
 
-    @Override public int getItemCount() { return tenants.size(); }
+    @Override
+    public int getItemCount() {
+        return tenants.size();
+    }
 
     static class TenantViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPhone;
         ImageButton btnEdit, btnDelete;
-        TenantViewHolder(View itemView) {
+
+        public TenantViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName   = itemView.findViewById(R.id.tvTenantName);
             tvPhone  = itemView.findViewById(R.id.tvTenantPhone);
