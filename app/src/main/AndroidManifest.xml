@@ -23,24 +23,34 @@
         <activity
             android:name=".Room"
             android:exported="false" />
+
         <activity
-            android:name=".RoomAdapter"
-            android:exported="false" /> <!-- RoomManagementActivity bây giờ là Launcher -->
-        <activity
-            android:name=".RoomManagementActivity"
+            android:name=".DangnhapActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter></activity>
+        <activity
+            android:name=".DangkiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".RoomAdapter"
+            android:exported="false" /> <!-- RoomManagementActivity bây giờ là Launcher -->
+        <activity
+            android:name=".RoomManagementActivity"
+            android:exported="false">
+
         </activity>
         <activity
             android:name=".TenantManagementActivity"
             android:exported="false" /> <!-- TestActivity không còn launcher -->
-        <activity
-            android:name=".TestActivity"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="false" />

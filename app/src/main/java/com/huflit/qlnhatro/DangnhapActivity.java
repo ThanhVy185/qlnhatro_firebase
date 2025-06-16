@@ -34,7 +34,7 @@ public class DangnhapActivity extends AppCompatActivity {
         if (!prefs.contains("email") && !prefs.contains("password")) {
             editor.putString("fullname", "Administrator");
             editor.putString("email", "admin@gmail.com");
-            editor.putString("password", "admin123");
+            editor.putString("password", "admin213");
             editor.apply();
         }
 
@@ -59,7 +59,7 @@ public class DangnhapActivity extends AppCompatActivity {
                 Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
                 // Chuyển sang trang chính, ví dụ: PhongActivity
-                Intent intent = new Intent(DangnhapActivity.this, RoomManagementActivity.class);
+                Intent intent = new Intent(DangnhapActivity.this, HomeActivity.class);
                 startActivity(intent);
                 finish();
             } else {

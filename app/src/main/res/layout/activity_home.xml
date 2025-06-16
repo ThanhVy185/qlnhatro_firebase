@@ -22,7 +22,8 @@
         android:layout_height="wrap_content"
         android:text="EXIT"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:backgroundTint="#E00202"/>
 
     <!-- 4 Buttons -->
     <GridLayout
@@ -41,27 +42,31 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text="QUẢN LÝ PHÒNG và NGƯỜI THUÊ" />
+            android:text="QUẢN LÝ PHÒNG và NGƯỜI THUÊ"
+            android:backgroundTint="#00C853"/>
 
         <Button
             android:id="@+id/btnQLHopDong"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text="QUẢN LÝ \nHỢP ĐỒNG" />
+            android:text="QUẢN LÝ \nHỢP ĐỒNG"
+            android:backgroundTint="#00C853"/>
 
         <Button
             android:id="@+id/btnQLHoaDon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text="QUẢN LÝ\nHÓA ĐƠN" />
+            android:text="QUẢN LÝ\nHÓA ĐƠN"
+            android:backgroundTint="#00C853"/>
 
         <Button
             android:id="@+id/btnQLThongBao"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text="QUẢN LÝ\nTHÔNG BÁO" />
+            android:text="QUẢN LÝ\nTHÔNG BÁO"
+            android:backgroundTint="#00C853"/>
     </GridLayout>
 </RelativeLayout>
