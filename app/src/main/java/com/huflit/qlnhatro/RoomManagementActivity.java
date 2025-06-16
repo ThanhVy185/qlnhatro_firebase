@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RoomManagementActivity extends AppCompatActivity {
-    private EditText etRoomNumber, etRoomName;
+    private EditText etRoomNumber, etRoomName, etMaxOccupancy;
     private Button btnSaveRoom, btnGoRooms, btnGoTenants;
     private FirebaseFirestore db;
     private RecyclerView rvRooms;
@@ -36,22 +36,23 @@ public class RoomManagementActivity extends AppCompatActivity {
         // Khởi tạo Firestore
         db = FirebaseFirestore.getInstance();
 
-        // Tìm view
-        etRoomNumber = findViewById(R.id.etRoomNumber);
-        etRoomName   = findViewById(R.id.etRoomName);
-        btnSaveRoom  = findViewById(R.id.btnSaveRoom);
-        btnGoRooms   = findViewById(R.id.btnGoRooms);
-        btnGoTenants = findViewById(R.id.btnGoTenants);
-        rvRooms      = findViewById(R.id.rvRooms);
+        // Kết nối các view
+        etRoomNumber   = findViewById(R.id.etRoomNumber);
+        etRoomName     = findViewById(R.id.etRoomName);
+        etMaxOccupancy = findViewById(R.id.etMaxOccupancy);
+        btnSaveRoom    = findViewById(R.id.btnSaveRoom);
+        btnGoRooms     = findViewById(R.id.btnGoRooms);
+        btnGoTenants   = findViewById(R.id.btnGoTenants);
+        rvRooms        = findViewById(R.id.rvRooms);
 
-        // Buttons điều hướng
+        // Nút điều hướng
         btnGoRooms.setEnabled(false);
         btnGoRooms.setAlpha(0.6f);
         btnGoTenants.setOnClickListener(v ->
                 startActivity(new Intent(this, TenantManagementActivity.class))
         );
 
-        // Thiết lập RecyclerView
+        // Setup RecyclerView và adapter
         adapter = new RoomAdapter(roomList, new RoomAdapter.OnItemActionListener() {
             @Override
             public void onEdit(Room room) {
@@ -66,19 +67,31 @@ public class RoomManagementActivity extends AppCompatActivity {
         rvRooms.setLayoutManager(new LinearLayoutManager(this));
         rvRooms.setAdapter(adapter);
 
-        // Load dữ liệu ban đầu
+        // Tải danh sách phòng ban đầu
         loadRooms();
 
+        // Xử lý thêm phòng mới
         btnSaveRoom.setOnClickListener(v -> {
             String number = etRoomNumber.getText().toString().trim();
             String name   = etRoomName.getText().toString().trim();
-            if (number.isEmpty() || name.isEmpty()) {
+            String maxStr = etMaxOccupancy.getText().toString().trim();
+            if (number.isEmpty() || name.isEmpty() || maxStr.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
+            int maxOcc;
+            try {
+                maxOcc = Integer.parseInt(maxStr);
+                if (maxOcc <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Số lượng tối đa phải là số nguyên dương", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Map<String, Object> room = new HashMap<>();
             room.put("number", number);
             room.put("name", name);
+            room.put("maxOccupancy", maxOcc);
             room.put("createdAt", System.currentTimeMillis());
 
             db.collection("rooms")
@@ -87,6 +100,7 @@ public class RoomManagementActivity extends AppCompatActivity {
                         Toast.makeText(this, "Thêm phòng thành công!", Toast.LENGTH_SHORT).show();
                         etRoomNumber.setText("");
                         etRoomName.setText("");
+                        etMaxOccupancy.setText("");
                         loadRooms();
                     })
                     .addOnFailureListener(e ->
@@ -102,10 +116,14 @@ public class RoomManagementActivity extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     roomList.clear();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
+                        int max = doc.contains("maxOccupancy")
+                                ? doc.getLong("maxOccupancy").intValue()
+                                : 0;
                         roomList.add(new Room(
                                 doc.getId(),
                                 doc.getString("number"),
-                                doc.getString("name")
+                                doc.getString("name"),
+                                max
                         ));
                     }
                     adapter.notifyDataSetChanged();
@@ -119,22 +137,34 @@ public class RoomManagementActivity extends AppCompatActivity {
         View v = getLayoutInflater().inflate(R.layout.dialog_edit_room, null);
         EditText etNum = v.findViewById(R.id.etEditRoomNumber);
         EditText etName = v.findViewById(R.id.etEditRoomName);
+        EditText etMax = v.findViewById(R.id.etEditRoomMax);
         etNum.setText(room.getNumber());
         etName.setText(room.getName());
+        etMax.setText(String.valueOf(room.getMaxOccupancy()));
 
         new AlertDialog.Builder(this)
                 .setTitle("Sửa thông tin phòng")
                 .setView(v)
                 .setPositiveButton("Lưu", (dialog, which) -> {
-                    String newNum = etNum.getText().toString().trim();
+                    String newNum  = etNum.getText().toString().trim();
                     String newName = etName.getText().toString().trim();
-                    if (newNum.isEmpty() || newName.isEmpty()) {
+                    String maxStr  = etMax.getText().toString().trim();
+                    if (newNum.isEmpty() || newName.isEmpty() || maxStr.isEmpty()) {
                         Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int newMax;
+                    try {
+                        newMax = Integer.parseInt(maxStr);
+                        if (newMax <= 0) throw new NumberFormatException();
+                    } catch (NumberFormatException ex) {
+                        Toast.makeText(this, "Số lượng tối đa phải là số nguyên dương", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Map<String, Object> upd = new HashMap<>();
                     upd.put("number", newNum);
                     upd.put("name", newName);
+                    upd.put("maxOccupancy", newMax);
 
                     db.collection("rooms").document(room.getId())
                             .update(upd)
