@@ -23,11 +23,11 @@ public class HomeActivity extends AppCompatActivity {
 
         btnQLPhong.setOnClickListener(v ->
                 startActivity(new Intent(this, RoomManagementActivity.class)));
-/*
-        btnQLHopDong.setOnClickListener(v ->
-                startActivity(new Intent(this, QuanLyHopDongActivity.class)));
 
-        btnQLHoaDon.setOnClickListener(v ->
+        btnQLHopDong.setOnClickListener(v ->
+                startActivity(new Intent(this, ContractListActivity.class)));
+
+       /* btnQLHoaDon.setOnClickListener(v ->
                 startActivity(new Intent(this, QuanLyHoaDonActivity.class)));
 
         btnQLThongBao.setOnClickListener(v ->
