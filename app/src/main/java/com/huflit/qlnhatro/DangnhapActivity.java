@@ -34,7 +34,7 @@ public class DangnhapActivity extends AppCompatActivity {
         if (!prefs.contains("email") && !prefs.contains("password")) {
             editor.putString("fullname", "Administrator");
             editor.putString("email", "admin@gmail.com");
-            editor.putString("password", "admin213");
+            editor.putString("password", "admin123");
             editor.apply();
         }
 
