@@ -32,7 +32,7 @@ public class CreateContractActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private List<Room> roomList = new ArrayList<>();
-    private List<Tenant> tenantList = new ArrayList<>();
+  //  private List<Tenant> tenantList = new ArrayList<>();
     private ArrayAdapter<String> roomAdapter, tenantAdapter;
 
     private final SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -70,7 +70,7 @@ public class CreateContractActivity extends AppCompatActivity {
         spRooms.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 String roomId = roomList.get(position).getId();
-                loadTenantsForRoom(roomId);
+                //loadTenantsForRoom(roomId);
             }
             @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
@@ -108,7 +108,7 @@ public class CreateContractActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Không load được phòng", Toast.LENGTH_SHORT).show());
     }
 
-    private void loadTenantsForRoom(String roomId) {
+  /*  private void loadTenantsForRoom(String roomId) {
         db.collection("tenants").whereEqualTo("roomId", roomId).get()
                 .addOnSuccessListener(snapshot -> {
                     tenantList.clear();
@@ -128,7 +128,7 @@ public class CreateContractActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Không load được người thuê", Toast.LENGTH_SHORT).show());
     }
-
+*/
     private void saveContract() {
         int roomPos = spRooms.getSelectedItemPosition();
         int tenPos  = spTenants.getSelectedItemPosition();
@@ -146,7 +146,7 @@ public class CreateContractActivity extends AppCompatActivity {
         }
 
         Room selR = roomList.get(roomPos);
-        Tenant selT = tenantList.get(tenPos);
+    //    Tenant selT = tenantList.get(tenPos);
         long rentVal = Long.parseLong(rentStr);
         long depVal  = Long.parseLong(depStr);
         long elecVal = Long.parseLong(elecStr);
@@ -155,8 +155,8 @@ public class CreateContractActivity extends AppCompatActivity {
         Map<String,Object> data = new HashMap<>();
         data.put("roomId", selR.getId());
         data.put("roomNumber", selR.getNumber());
-        data.put("tenantId", selT.getId());
-        data.put("tenantName", selT.getName());
+       // data.put("tenantId", selT.getId());
+       // data.put("tenantName", selT.getName());
         data.put("rent", rentVal);
         data.put("deposit", depVal);
         data.put("electricityFee", elecVal);

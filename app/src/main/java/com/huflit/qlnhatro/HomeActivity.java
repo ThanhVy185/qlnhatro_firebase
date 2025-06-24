@@ -26,7 +26,7 @@ public class HomeActivity extends AppCompatActivity {
 
         btnQLHopDong.setOnClickListener(v ->
                 startActivity(new Intent(this, ContractListActivity.class)));
-
+// chưa có Hóa đơn và thông báo!!
        /* btnQLHoaDon.setOnClickListener(v ->
                 startActivity(new Intent(this, QuanLyHoaDonActivity.class)));
 
@@ -36,4 +36,3 @@ public class HomeActivity extends AppCompatActivity {
         btnExit.setOnClickListener(v -> finishAffinity()); // Thoát ứng dụng
     }
 }
-

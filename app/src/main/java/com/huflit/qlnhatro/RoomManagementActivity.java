@@ -49,9 +49,9 @@ public class RoomManagementActivity extends AppCompatActivity {
         // Navigation
         btnGoRooms.setEnabled(false);
         btnGoRooms.setAlpha(0.6f);
-        btnGoTenants.setOnClickListener(v ->
+       /* btnGoTenants.setOnClickListener(v ->
                 startActivity(new Intent(this, TenantManagementActivity.class))
-        );
+        );*/
 
         // RecyclerView & Adapter
         adapter = new RoomAdapter(roomList, new RoomAdapter.OnItemActionListener() {

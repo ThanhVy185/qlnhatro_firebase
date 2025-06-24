@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
         btngoRooms.setOnClickListener(v -> {
             startActivity(new Intent(this, RoomManagementActivity.class));
         });
-        btngoTenants = findViewById(R.id.btnGoTenants);
+      /*  btngoTenants = findViewById(R.id.btnGoTenants);
         btngoTenants.setOnClickListener(v -> {
             startActivity(new Intent(this, TenantManagementActivity.class));
-        });
+        });*/
 
 
 

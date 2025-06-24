@@ -108,7 +108,7 @@ public class ContractListActivity extends AppCompatActivity {
 
         // Prepare room & tenant lists
         List<Room> rooms = new ArrayList<>();
-        List<Tenant> tenants = new ArrayList<>();
+     //   List<Tenant> tenants = new ArrayList<>();
 
         // Room spinner adapter
         ArrayAdapter<String> roomAdapter = new ArrayAdapter<>(this,
@@ -147,7 +147,7 @@ public class ContractListActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selRoomId = rooms.get(pos).getId();
-                tenants.clear(); tenantAdapter.clear();
+               /* tenants.clear(); tenantAdapter.clear();
                 db.collection("tenants").whereEqualTo("roomId", selRoomId).get()
                         .addOnSuccessListener(ts -> {
                             for (QueryDocumentSnapshot td : ts) {
@@ -166,7 +166,7 @@ public class ContractListActivity extends AppCompatActivity {
                                 }
                             }
                             tenantAdapter.notifyDataSetChanged();
-                        });
+                        });*/
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -191,7 +191,7 @@ public class ContractListActivity extends AppCompatActivity {
                         return;
                     }
                     Room selR = rooms.get(rp);
-                    Tenant selT = tenants.get(tp);
+                    //Tenant selT = tenants.get(tp);
 
                     long rentVal  = Long.parseLong(etRent.getText().toString().trim());
                     long depVal   = Long.parseLong(etDep.getText().toString().trim());
@@ -203,8 +203,8 @@ public class ContractListActivity extends AppCompatActivity {
                     Map<String,Object> upd = new HashMap<>();
                     upd.put("roomId", selR.getId());
                     upd.put("roomNumber", selR.getNumber());
-                    upd.put("tenantId", selT.getId());
-                    upd.put("tenantName", selT.getName());
+         //           upd.put("tenantId", selT.getId());
+                    //upd.put("tenantName", selT.getName());
                     upd.put("rent", rentVal);
                     upd.put("deposit", depVal);
                     upd.put("electricityFee", elecVal);
