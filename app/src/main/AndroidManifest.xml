@@ -18,22 +18,7 @@
             android:name=".Contract"
             android:exported="false" />
         <activity
-            android:name=".CreateContractActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CreateContractActivity.java"
-            android:exported="false" />
-        <activity
             android:name=".ContractAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".ContractListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TenantAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".Tenant"
             android:exported="false" />
         <activity
             android:name=".Room"
@@ -60,8 +45,12 @@
             android:name=".RoomManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".TenantManagementActivity"
-            android:exported="false" /> <!-- TestActivity không còn launcher -->
+            android:name=".ContractDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ContractManagementActivity"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="false" />

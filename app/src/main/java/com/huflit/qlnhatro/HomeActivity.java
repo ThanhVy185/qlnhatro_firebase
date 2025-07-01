@@ -25,7 +25,7 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, RoomManagementActivity.class)));
 
         btnQLHopDong.setOnClickListener(v ->
-                startActivity(new Intent(this, ContractListActivity.class)));
+                startActivity(new Intent(this, ContractManagementActivity.class)));
 // chưa có Hóa đơn và thông báo!!
        /* btnQLHoaDon.setOnClickListener(v ->
                 startActivity(new Intent(this, QuanLyHoaDonActivity.class)));

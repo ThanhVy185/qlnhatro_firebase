@@ -1,61 +1,148 @@
 package com.huflit.qlnhatro;
 
-/**
- * Model cho một hợp đồng.
- */
 public class Contract {
     private String id;
     private String roomId;
-    private String roomNumber;
-    private String tenantId;
+    private String contractCode;
     private String tenantName;
-
-    private long rent;
-    private long deposit;
+    private String identityNumber;
+    private String imageUrl;
     private long electricityFee;
     private long waterFee;
-
-    private String startDate;
-    private String endDate;
-    private long createdAt;
+    private long serviceFee;
+    private long parkingFee;
+    private String invoiceId;
+    private long dueDate;
+    private boolean isPaid;
 
     // Firestore cần constructor không args
     public Contract() {}
 
-    // Getters và setters
-    public String getId()               { return id; }
-    public void   setId(String id)      { this.id = id; }
+    public Contract(String id,
+                    String roomId,
+                    String contractCode,
+                    String tenantName,
+                    String identityNumber,
+                    String imageUrl,
+                    long electricityFee,
+                    long waterFee,
+                    long serviceFee,
+                    long parkingFee,
+                    String invoiceId,
+                    long dueDate,
+                    boolean isPaid) {
+        this.id = id;
+        this.roomId = roomId;
+        this.contractCode = contractCode;
+        this.tenantName = tenantName;
+        this.identityNumber = identityNumber;
+        this.imageUrl = imageUrl;
+        this.electricityFee = electricityFee;
+        this.waterFee = waterFee;
+        this.serviceFee = serviceFee;
+        this.parkingFee = parkingFee;
+        this.invoiceId = invoiceId;
+        this.dueDate = dueDate;
+        this.isPaid = isPaid;
+    }
 
-    public String getRoomId()           { return roomId; }
-    public void   setRoomId(String roomId) { this.roomId = roomId; }
+    // === Getters & Setters ===
 
-    public String getRoomNumber()       { return roomNumber; }
-    public void   setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getTenantId()         { return tenantId; }
-    public void   setTenantId(String tenantId) { this.tenantId = tenantId; }
+    public String getRoomId() {
+        return roomId;
+    }
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
 
-    public String getTenantName()       { return tenantName; }
-    public void   setTenantName(String tenantName) { this.tenantName = tenantName; }
+    public String getContractCode() {
+        return contractCode;
+    }
+    public void setContractCode(String contractCode) {
+        this.contractCode = contractCode;
+    }
 
-    public long   getRent()             { return rent; }
-    public void   setRent(long rent)    { this.rent = rent; }
+    public String getTenantName() {
+        return tenantName;
+    }
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
+    }
 
-    public long   getDeposit()          { return deposit; }
-    public void   setDeposit(long deposit) { this.deposit = deposit; }
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+    public void setIdentityNumber(String identityNumber) {
+        this.identityNumber = identityNumber;
+    }
 
-    public long   getElectricityFee()   { return electricityFee; }
-    public void   setElectricityFee(long electricityFee) { this.electricityFee = electricityFee; }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
-    public long   getWaterFee()         { return waterFee; }
-    public void   setWaterFee(long waterFee) { this.waterFee = waterFee; }
+    public long getElectricityFee() {
+        return electricityFee;
+    }
+    public void setElectricityFee(long electricityFee) {
+        this.electricityFee = electricityFee;
+    }
 
-    public String getStartDate()        { return startDate; }
-    public void   setStartDate(String startDate) { this.startDate = startDate; }
+    public long getWaterFee() {
+        return waterFee;
+    }
+    public void setWaterFee(long waterFee) {
+        this.waterFee = waterFee;
+    }
 
-    public String getEndDate()          { return endDate; }
-    public void   setEndDate(String endDate) { this.endDate = endDate; }
+    public long getServiceFee() {
+        return serviceFee;
+    }
+    public void setServiceFee(long serviceFee) {
+        this.serviceFee = serviceFee;
+    }
 
-    public long   getCreatedAt()        { return createdAt; }
-    public void   setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+    public long getParkingFee() {
+        return parkingFee;
+    }
+    public void setParkingFee(long parkingFee) {
+        this.parkingFee = parkingFee;
+    }
+
+    public String getInvoiceId() {
+        return invoiceId;
+    }
+    public void setInvoiceId(String invoiceId) {
+        this.invoiceId = invoiceId;
+    }
+
+    public long getDueDate() {
+        return dueDate;
+    }
+    public void setDueDate(long dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public boolean isPaid() {
+        return isPaid;
+    }
+    public void setPaid(boolean paid) {
+        isPaid = paid;
+    }
+
+    /**
+     * Tính tổng các khoản phí
+     */
+    public long getTotalFee() {
+        return electricityFee + waterFee + serviceFee + parkingFee;
+    }
 }

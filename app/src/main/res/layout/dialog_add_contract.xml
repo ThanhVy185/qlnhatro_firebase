@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Mã hợp đồng -->
+        <EditText
+            android:id="@+id/etContractCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mã hợp đồng"/>
+
+        <!-- Chọn phòng -->
+        <Spinner
+            android:id="@+id/spnRoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- Tên người thuê -->
+        <EditText
+            android:id="@+id/etTenantName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tên người thuê"
+            android:layout_marginTop="8dp"/>
+
+        <!-- CCCD/CMND -->
+        <EditText
+            android:id="@+id/etIdentityNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="CCCD/CMND"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Ảnh hợp đồng -->
+        <ImageView
+            android:id="@+id/ivContractPic"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerCrop"
+            android:background="@color/gray_light"/>
+
+        <Button
+            android:id="@+id/btnPickImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn ảnh"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Hạn đóng tiền -->
+        <EditText
+            android:id="@+id/etEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Hạn hợp đồng (dd/MM/yyyy)"
+            android:inputType="date" />
+
+        <!-- Lưu hợp đồng -->
+        <Button
+            android:id="@+id/btnSaveContract"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lưu"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>

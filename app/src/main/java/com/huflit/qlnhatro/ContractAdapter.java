@@ -3,69 +3,63 @@ package com.huflit.qlnhatro;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.huflit.qlnhatro.R;
+import com.huflit.qlnhatro.Contract;
+
 import java.util.List;
+import java.util.Map;
 
-public class ContractAdapter extends RecyclerView.Adapter<ContractAdapter.ContractViewHolder> {
-    public interface OnActionListener {
-        void onEdit(Contract contract);
-        void onDelete(Contract contract);
-    }
+public class ContractAdapter extends RecyclerView.Adapter<ContractAdapter.ViewHolder> {
+    public interface OnItemClickListener { void onClick(Contract c); }
 
-    private final List<Contract> contracts;
-    private final OnActionListener listener;
+    private List<Contract> list;
+    private Map<String, String> roomNames;       // map roomId -> roomDisplayName
+    private OnItemClickListener listener;
 
-    public ContractAdapter(List<Contract> contracts, OnActionListener listener) {
-        this.contracts = contracts;
+    public ContractAdapter(List<Contract> list,
+                           Map<String, String> roomNames,
+                           OnItemClickListener listener) {
+        this.list = list;
+        this.roomNames = roomNames;
         this.listener = listener;
     }
 
-    @NonNull
-    @Override
-    public ContractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+    @NonNull @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_contract, parent, false);
-        return new ContractViewHolder(view);
+        return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ContractViewHolder holder, int position) {
-        Contract contract = contracts.get(position);
-        holder.tvRoom.setText("Phòng: " + contract.getRoomNumber());
-        holder.tvTenant.setText("Người thuê: " + contract.getTenantName());
-        holder.tvDates.setText("Từ " + contract.getStartDate() + " đến " + contract.getEndDate());
-        holder.tvRent.setText("Giá thuê: " + contract.getRent());
-        holder.tvDeposit.setText("Cọc: " + contract.getDeposit());
-        holder.tvElec.setText("Điện: " + contract.getElectricityFee());
-        holder.tvWater.setText("Nước: " + contract.getWaterFee());
+    public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
+        Contract c = list.get(pos);
 
-        holder.btnEdit.setOnClickListener(v -> listener.onEdit(contract));
-        holder.btnDelete.setOnClickListener(v -> listener.onDelete(contract));
+        // Lấy tên phòng từ map, fallback thành "Phòng <ID>" nếu không có trong map
+        String roomId = c.getRoomId();
+        String displayName = roomNames.get(roomId);
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = "Phòng " + roomId;
+        }
+        h.tvRoom.setText(displayName);
+
+        h.tvStatus.setText(c.isPaid() ? "Đã thanh toán" : "Chưa thanh toán");
+        h.itemView.setOnClickListener(v -> listener.onClick(c));
     }
 
-    @Override
-    public int getItemCount() {
-        return contracts.size();
-    }
+    @Override public int getItemCount() { return list.size(); }
 
-    static class ContractViewHolder extends RecyclerView.ViewHolder {
-        TextView tvRoom, tvTenant, tvDates, tvRent, tvDeposit, tvElec, tvWater;
-        ImageButton btnEdit, btnDelete;
-
-        ContractViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvRoom    = itemView.findViewById(R.id.tvRoomLabel);
-            tvTenant  = itemView.findViewById(R.id.tvTenantLabel);
-            tvDates   = itemView.findViewById(R.id.tvDates);
-            tvRent    = itemView.findViewById(R.id.tvContractRent);
-            tvDeposit = itemView.findViewById(R.id.tvContractDeposit);
-            tvElec    = itemView.findViewById(R.id.tvContractElectricity);
-            tvWater   = itemView.findViewById(R.id.tvContractWater);
-            btnEdit   = itemView.findViewById(R.id.btnEditContract);
-            btnDelete = itemView.findViewById(R.id.btnDeleteContract);
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvRoom, tvStatus;
+        ViewHolder(View v) {
+            super(v);
+            tvRoom   = v.findViewById(R.id.tvContractRoom);
+            tvStatus = v.findViewById(R.id.tvContractStatus);
         }
     }
 }

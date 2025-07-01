@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Chỉ số cũ -->
+        <EditText
+            android:id="@+id/etOldReading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Chỉ số cũ (kWh)"
+            android:inputType="number"/>
+
+        <!-- Chỉ số mới -->
+        <EditText
+            android:id="@+id/etNewReading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Chỉ số mới (kWh)"
+            android:inputType="number"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Đơn giá cố định hiển thị -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đơn giá điện: 3.500₫/kWh"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Tiền nước -->
+        <EditText
+            android:id="@+id/etWaterFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tiền nước"
+            android:inputType="number"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Tiền dịch vụ -->
+        <EditText
+            android:id="@+id/etServiceFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tiền dịch vụ"
+            android:inputType="number"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Tiền gửi xe -->
+        <EditText
+            android:id="@+id/etParkingFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tiền gửi xe"
+            android:inputType="number"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Lưu hóa đơn -->
+        <Button
+            android:id="@+id/btnSaveInvoice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lưu hóa đơn"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>
