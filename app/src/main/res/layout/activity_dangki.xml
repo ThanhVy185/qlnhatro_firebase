@@ -5,106 +5,153 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".DangkiActivity">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/formLayout"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="20dp"
-        android:padding="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="60dp"
+        android:text="Tạo tài khoản mới"
+        android:textColor="#1A202C"
+        android:textSize="28sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Bắt đầu quản lý phòng trọ của bạn"
+        android:textColor="#718096"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <!-- Sử dụng TextInputLayout để có giao diện input hiện đại -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutFullNamedk"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Họ và tên"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtFullNamedk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName|textCapWords" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutEmaildk"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Email"
+        app:layout_constraintEnd_toEndOf="@id/layoutFullNamedk"
+        app:layout_constraintStart_toStartOf="@id/layoutFullNamedk"
+        app:layout_constraintTop_toBottomOf="@id/layoutFullNamedk">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtEmaildk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutPassworddk"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Mật khẩu"
+        app:layout_constraintEnd_toEndOf="@id/layoutEmaildk"
+        app:layout_constraintStart_toStartOf="@id/layoutEmaildk"
+        app:layout_constraintTop_toBottomOf="@id/layoutEmaildk"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtPassworddk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutConfirmPassworddk"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Xác nhận mật khẩu"
+        app:layout_constraintEnd_toEndOf="@id/layoutPassworddk"
+        app:layout_constraintStart_toStartOf="@id/layoutPassworddk"
+        app:layout_constraintTop_toBottomOf="@id/layoutPassworddk"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtConfirmPassworddk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/button_dangky"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="#00C853"
+        android:text="Đăng Ký"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@id/layoutConfirmPassworddk"
+        app:layout_constraintStart_toStartOf="@id/layoutConfirmPassworddk"
+        app:layout_constraintTop_toBottomOf="@+id/layoutConfirmPassworddk" />
+
+    <!-- Dòng chữ để chuyển qua trang đăng nhập -->
+    <LinearLayout
+        android:id="@+id/layoutSwitchToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đăng ký tài khoản"
+            android:text="Đã có tài khoản? "
+            android:textColor="#1A202C"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvLoginLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng nhập"
             android:textColor="#00C853"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/edtFullNamedk"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="15dp"
-            android:hint="Họ tên"
-            android:inputType="textPersonName"
-            app:layout_constraintBottom_toTopOf="@+id/edtEmaildk"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
-
-        <EditText
-            android:id="@+id/edtEmaildk"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            app:layout_constraintBottom_toTopOf="@+id/edtPassworddk"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edtFullNamedk" />
-
-        <EditText
-            android:id="@+id/edtPassworddk"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
-            android:hint="Mật khẩu"
-            android:inputType="textPassword"
-            app:layout_constraintBottom_toTopOf="@+id/edtConfirmPassworddk"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edtEmaildk" />
-
-        <EditText
-            android:id="@+id/edtConfirmPassworddk"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-
-            android:layout_marginTop="15dp"
-            android:hint="Xác nhận mật khẩu"
-            android:inputType="textPassword"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edtPassworddk" />
-
-        <Button
-            android:id="@+id/button_dangky"
-            android:layout_width="120dp"
-            android:layout_height="55dp"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="#00C853"
-            android:text="Đăng kí"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtConfirmPassworddk" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

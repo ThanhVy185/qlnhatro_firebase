@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class DangkiActivity extends AppCompatActivity {
     EditText edtFullNamedk, edtEmaildk, edtPassworddk, edtConfirmPassworddk;
     Button btnDangKy;
+    TextView tvLoginLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +26,8 @@ public class DangkiActivity extends AppCompatActivity {
         edtPassworddk = findViewById(R.id.edtPassworddk);
         edtConfirmPassworddk = findViewById(R.id.edtConfirmPassworddk);
         btnDangKy = findViewById(R.id.button_dangky);
+        tvLoginLink = findViewById(R.id.tvLoginLink);
+        tvLoginLink.setOnClickListener(v -> startActivity(new Intent(DangkiActivity.this, DangnhapActivity.class)));
 
         btnDangKy.setOnClickListener(v -> {
             String name = edtFullNamedk.getText().toString().trim();

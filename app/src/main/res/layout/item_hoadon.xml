@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sử dụng CardView để tạo hiệu ứng thẻ nổi, có đổ bóng và góc bo tròn -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
+
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <!-- LinearLayout ngang chính, chứa icon và khối thông tin -->
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:padding="16dp">
+
+<!-- Icon với nền tròn để làm nổi bật -->
+<ImageView
+    android:id="@+id/imageView"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_gravity="center_vertical"
+    android:background="@drawable/bg_status_paid"
+    android:padding="10dp"
+    android:src="@drawable/img_home"
+    app:tint="#2F855A"
+    tools:ignore="ContentDescription" />
+
+<!-- LinearLayout dọc chứa toàn bộ thông tin chữ -->
+<LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <!-- Tên phòng, to và đậm -->
+    <TextView
+        android:id="@+id/txtPhong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#1A202C"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="Phòng: P101" />
+
+    <!-- Tổng tiền, nằm dưới tên phòng -->
+    <TextView
+        android:id="@+id/txtTien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#4A5568"
+        android:textSize="16sp"
+        tools:text="Tổng tiền: 1,600,000đ" />
+
+    <!-- Đường kẻ ngang để phân tách -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- LinearLayout ngang chứa ngày và trạng thái -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Ngày lập, nằm bên trái -->
+        <TextView
+            android:id="@+id/txtNgay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#718096"
+            android:textSize="14sp"
+            tools:text="Ngày lập: 15/06/2025" />
+
+        <!-- View rỗng để đẩy trạng thái sang phải -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Trạng thái, nằm bên phải, trông như một "tag" -->
+        <TextView
+            android:id="@+id/txtTrangThai"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:background="@drawable/bg_status_unpaid"
+            tools:text="Chưa thanh toán"
+            tools:textColor="#C53030" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+</LinearLayout>
+
+    </androidx.cardview.widget.CardView>
