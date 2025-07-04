@@ -1,53 +1,22 @@
 package com.huflit.qlnhatro;
 
+import com.google.firebase.firestore.PropertyName;
+
 public class Contract {
     private String id;
-    private String roomId;
     private String contractCode;
+    private String roomId;
     private String tenantName;
     private String identityNumber;
+    private long endDate;
     private String imageUrl;
-    private long electricityFee;
-    private long waterFee;
-    private long serviceFee;
-    private long parkingFee;
     private String invoiceId;
-    private long dueDate;
     private boolean isPaid;
 
-    // Firestore cần constructor không args
+    // Mandatory empty constructor for Firestore deserialization
     public Contract() {}
 
-    public Contract(String id,
-                    String roomId,
-                    String contractCode,
-                    String tenantName,
-                    String identityNumber,
-                    String imageUrl,
-                    long electricityFee,
-                    long waterFee,
-                    long serviceFee,
-                    long parkingFee,
-                    String invoiceId,
-                    long dueDate,
-                    boolean isPaid) {
-        this.id = id;
-        this.roomId = roomId;
-        this.contractCode = contractCode;
-        this.tenantName = tenantName;
-        this.identityNumber = identityNumber;
-        this.imageUrl = imageUrl;
-        this.electricityFee = electricityFee;
-        this.waterFee = waterFee;
-        this.serviceFee = serviceFee;
-        this.parkingFee = parkingFee;
-        this.invoiceId = invoiceId;
-        this.dueDate = dueDate;
-        this.isPaid = isPaid;
-    }
-
-    // === Getters & Setters ===
-
+    // --- id ---
     public String getId() {
         return id;
     }
@@ -55,13 +24,7 @@ public class Contract {
         this.id = id;
     }
 
-    public String getRoomId() {
-        return roomId;
-    }
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
-    }
-
+    // --- contractCode ---
     public String getContractCode() {
         return contractCode;
     }
@@ -69,6 +32,15 @@ public class Contract {
         this.contractCode = contractCode;
     }
 
+    // --- roomId ---
+    public String getRoomId() {
+        return roomId;
+    }
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    // --- tenantName ---
     public String getTenantName() {
         return tenantName;
     }
@@ -76,6 +48,7 @@ public class Contract {
         this.tenantName = tenantName;
     }
 
+    // --- identityNumber ---
     public String getIdentityNumber() {
         return identityNumber;
     }
@@ -83,6 +56,15 @@ public class Contract {
         this.identityNumber = identityNumber;
     }
 
+    // --- endDate ---
+    public long getEndDate() {
+        return endDate;
+    }
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
+    }
+
+    // --- imageUrl ---
     public String getImageUrl() {
         return imageUrl;
     }
@@ -90,34 +72,7 @@ public class Contract {
         this.imageUrl = imageUrl;
     }
 
-    public long getElectricityFee() {
-        return electricityFee;
-    }
-    public void setElectricityFee(long electricityFee) {
-        this.electricityFee = electricityFee;
-    }
-
-    public long getWaterFee() {
-        return waterFee;
-    }
-    public void setWaterFee(long waterFee) {
-        this.waterFee = waterFee;
-    }
-
-    public long getServiceFee() {
-        return serviceFee;
-    }
-    public void setServiceFee(long serviceFee) {
-        this.serviceFee = serviceFee;
-    }
-
-    public long getParkingFee() {
-        return parkingFee;
-    }
-    public void setParkingFee(long parkingFee) {
-        this.parkingFee = parkingFee;
-    }
-
+    // --- invoiceId ---
     public String getInvoiceId() {
         return invoiceId;
     }
@@ -125,24 +80,14 @@ public class Contract {
         this.invoiceId = invoiceId;
     }
 
-    public long getDueDate() {
-        return dueDate;
-    }
-    public void setDueDate(long dueDate) {
-        this.dueDate = dueDate;
-    }
-
+    // --- isPaid ---
+    @PropertyName("isPaid")
     public boolean isPaid() {
         return isPaid;
     }
-    public void setPaid(boolean paid) {
-        isPaid = paid;
-    }
 
-    /**
-     * Tính tổng các khoản phí
-     */
-    public long getTotalFee() {
-        return electricityFee + waterFee + serviceFee + parkingFee;
+    @PropertyName("isPaid")
+    public void setIsPaid(boolean isPaid) {
+        this.isPaid = isPaid;
     }
 }

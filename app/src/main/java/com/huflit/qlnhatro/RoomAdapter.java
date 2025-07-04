@@ -10,47 +10,53 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder> {
-    public interface OnItemActionListener {
+
+    public interface RoomListener {
         void onEdit(Room room);
         void onDelete(Room room);
     }
 
-    private List<Room> rooms;
-    private OnItemActionListener listener;
+    private final List<Room> rooms;
+    private final RoomListener listener;
 
-    public RoomAdapter(List<Room> rooms, OnItemActionListener listener) {
+    public RoomAdapter(List<Room> rooms, RoomListener listener) {
         this.rooms = rooms;
         this.listener = listener;
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public RoomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
+        View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_room, parent, false);
-        return new RoomViewHolder(v);
+        return new RoomViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RoomViewHolder h, int pos) {
-        Room r = rooms.get(pos);
-        h.tvNumber.setText("Phòng " + r.getNumber());
-        h.tvName.setText(r.getName());
-        h.btnEdit.setOnClickListener(v -> listener.onEdit(r));
-        h.btnDelete.setOnClickListener(v -> listener.onDelete(r));
+    public void onBindViewHolder(@NonNull RoomViewHolder holder, int position) {
+        Room r = rooms.get(position);
+        holder.tvNumber.setText("Phòng " + r.getNumber());
+        holder.tvId.setText("Mã: " + r.getId());
+
+        holder.btnEdit.setOnClickListener(v -> listener.onEdit(r));
+        holder.btnDelete.setOnClickListener(v -> listener.onDelete(r));
     }
 
-    @Override public int getItemCount() { return rooms.size(); }
+    @Override
+    public int getItemCount() {
+        return rooms.size();
+    }
 
-    static class RoomViewHolder extends RecyclerView.ViewHolder {
-        TextView tvNumber, tvName;
+    public static class RoomViewHolder extends RecyclerView.ViewHolder {
+        TextView tvNumber, tvId;
         ImageButton btnEdit, btnDelete;
-        RoomViewHolder(View itemView) {
+
+        public RoomViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNumber = itemView.findViewById(R.id.tvRoomNumber);
-            tvName   = itemView.findViewById(R.id.tvRoomName);
-            btnEdit  = itemView.findViewById(R.id.btnEditRoom);
-            btnDelete= itemView.findViewById(R.id.btnDeleteRoom);
+            tvId = itemView.findViewById(R.id.tvRoomName);
+            btnEdit = itemView.findViewById(R.id.btnEditRoom);
+            btnDelete = itemView.findViewById(R.id.btnDeleteRoom);
         }
     }
 }
-

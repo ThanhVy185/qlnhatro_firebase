@@ -1,10 +1,15 @@
 package com.huflit.qlnhatro;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,109 +18,176 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ContractDetailActivity extends AppCompatActivity {
-    private TextView tvContractCode, tvTenantName, tvIdNumber;
-    private ImageView ivContractImage;
+    private TextView tvContractHeader, tvContractCode, tvTenantName, tvIdNumber;
+    private TextView tvElecLabel, tvElecValue, tvWaterLabel, tvWaterValue;
+    private TextView tvServiceLabel, tvServiceValue, tvParkingLabel, tvParkingValue;
     private TextView tvTotalFee;
-    private Button btnMarkPaid;
+    private ImageView ivContractImage;
+    private MaterialButton btnMarkPaid, btnDelete;
+
     private FirebaseFirestore db;
     private String contractId;
+    private String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Edge-to-edge nếu bạn cần
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_contract_detail);
 
-        // Áp padding cho hệ thống bar nếu cần
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scrollContract), (v, insets) -> {
-            Insets sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(sys.left, sys.top, sys.right, sys.bottom);
-            return insets;
-        });
+        ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(R.id.scrollDetail),
+                (v,insets) -> {
+                    Insets s = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    v.setPadding(s.left,s.top,s.right,s.bottom);
+                    return insets;
+                }
+        );
 
-        // 1) Khởi tạo các view ở phần header
-        tvContractCode  = findViewById(R.id.tvContractCode);
-        tvTenantName    = findViewById(R.id.tvTenantName);
-        tvIdNumber      = findViewById(R.id.tvIdNumber);
+        // Bind views
+        tvContractHeader = findViewById(R.id.tvContractHeader);
+        tvContractCode   = findViewById(R.id.tvContractCode);
+        tvTenantName     = findViewById(R.id.tvTenantName);
+        tvIdNumber       = findViewById(R.id.tvIdNumber);
+
+        LinearLayout elecLayout    = findViewById(R.id.layoutElec);
+        LinearLayout waterLayout   = findViewById(R.id.layoutWater);
+        LinearLayout serviceLayout = findViewById(R.id.layoutService);
+        LinearLayout parkingLayout = findViewById(R.id.layoutParking);
+
+        tvElecLabel    = elecLayout.findViewById(R.id.tvFeeLabel);
+        tvElecValue    = elecLayout.findViewById(R.id.tvFeeValue);
+        tvWaterLabel   = waterLayout.findViewById(R.id.tvFeeLabel);
+        tvWaterValue   = waterLayout.findViewById(R.id.tvFeeValue);
+        tvServiceLabel = serviceLayout.findViewById(R.id.tvFeeLabel);
+        tvServiceValue = serviceLayout.findViewById(R.id.tvFeeValue);
+        tvParkingLabel = parkingLayout.findViewById(R.id.tvFeeLabel);
+        tvParkingValue = parkingLayout.findViewById(R.id.tvFeeValue);
+
+        tvTotalFee      = findViewById(R.id.tvTotalFee);
         ivContractImage = findViewById(R.id.ivContractImage);
+        btnMarkPaid     = findViewById(R.id.btnMarkPaid);
+        btnDelete       = findViewById(R.id.btnDelete);
 
-        // 2) Khởi tạo include item_fee
-        View layoutElec    = findViewById(R.id.layoutElec);
-        View layoutWater   = findViewById(R.id.layoutWater);
-        View layoutService = findViewById(R.id.layoutService);
-        View layoutParking = findViewById(R.id.layoutParking);
-
-        // Lấy TextView bên trong mỗi include
-        TextView tvElecLabel    = layoutElec.findViewById(R.id.tvFeeLabel);
-        TextView tvElecValue    = layoutElec.findViewById(R.id.tvFeeValue);
-
-        TextView tvWaterLabel   = layoutWater.findViewById(R.id.tvFeeLabel);
-        TextView tvWaterValue   = layoutWater.findViewById(R.id.tvFeeValue);
-
-        TextView tvServiceLabel = layoutService.findViewById(R.id.tvFeeLabel);
-        TextView tvServiceValue = layoutService.findViewById(R.id.tvFeeValue);
-
-        TextView tvParkingLabel = layoutParking.findViewById(R.id.tvFeeLabel);
-        TextView tvParkingValue = layoutParking.findViewById(R.id.tvFeeValue);
-
-        // 3) Tổng cộng và nút thanh toán
-        tvTotalFee  = findViewById(R.id.tvTotalFee);
-        btnMarkPaid = findViewById(R.id.btnMarkPaid);
-
-        // 4) Firestore
         db = FirebaseFirestore.getInstance();
         contractId = getIntent().getStringExtra("contractId");
+        if (contractId == null) {
+            Toast.makeText(this, "Không tìm thấy hợp đồng", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        // 5) Load contract và invoice
-        db.collection("contracts").document(contractId)
-                .get().addOnSuccessListener(doc -> {
+        loadContract();
+
+        btnMarkPaid.setOnClickListener(v -> markAsPaid());
+        btnDelete.setOnClickListener(v -> confirmDeletion());
+    }
+
+    private void loadContract() {
+        db.collection("contracts").document(contractId).get()
+                .addOnSuccessListener(doc -> {
                     Contract c = doc.toObject(Contract.class);
-                    // bind thông tin contract
+                    if (c == null) return;
+
+                    // Header
+                    db.collection("rooms").document(c.getRoomId()).get()
+                            .addOnSuccessListener(rdoc -> {
+                                Room r = rdoc.toObject(Room.class);
+                                if (r != null)
+                                    tvContractHeader.setText("HỢP ĐỒNG PHÒNG " + r.getNumber());
+                            });
+
                     tvContractCode.setText(c.getContractCode());
                     tvTenantName.setText(c.getTenantName());
                     tvIdNumber.setText(c.getIdentityNumber());
-                    Glide.with(this)
-                            .load(c.getImageUrl())
-                            .placeholder(R.drawable.ic_placeholder)
-                            .into(ivContractImage);
 
-                    // nếu có invoiceId thì load
+                    // Image
+                    imageUrl = c.getImageUrl();
+                    if (imageUrl != null && !imageUrl.isEmpty()) {
+                        Glide.with(this)
+                                .load(Uri.parse(imageUrl))
+                                .centerCrop()
+                                .into(ivContractImage);
+                        ivContractImage.setOnClickListener(v -> showFullScreenImage());
+                    }
+
+                    // Invoice
                     if (c.getInvoiceId() != null) {
-                        db.collection("invoices").document(c.getInvoiceId())
-                                .get().addOnSuccessListener(invDoc -> {
-                                    Invoice inv = invDoc.toObject(Invoice.class);
-                                    // bind invoice
-                                    tvElecLabel.setText("Tiền điện");
-                                    tvElecValue.setText(formatCurrency(inv.getElectricityFee()));
-
-                                    tvWaterLabel.setText("Tiền nước");
-                                    tvWaterValue.setText(formatCurrency(inv.getWaterFee()));
-
-                                    tvServiceLabel.setText("Tiền dịch vụ");
-                                    tvServiceValue.setText(formatCurrency(inv.getServiceFee()));
-
-                                    tvParkingLabel.setText("Tiền xe");
-                                    tvParkingValue.setText(formatCurrency(inv.getParkingFee()));
-
-                                    tvTotalFee.setText(formatCurrency(inv.getTotalFee()));
-
-                                    // thiết lập nút thanh toán
-                                    btnMarkPaid.setVisibility(inv.isPaid() ? View.GONE : View.VISIBLE);
-                                    btnMarkPaid.setOnClickListener(v -> {
-                                        db.collection("invoices").document(inv.getId())
-                                                .update("paid", true)
-                                                .addOnSuccessListener(a -> btnMarkPaid.setVisibility(View.GONE));
-                                    });
+                        db.collection("invoices").document(c.getInvoiceId()).get()
+                                .addOnSuccessListener(inv -> {
+                                    Invoice i = inv.toObject(Invoice.class);
+                                    if (i != null) {
+                                        tvElecLabel.setText("Tiền điện");
+                                        tvElecValue.setText(String.format("%,d₫", i.getElectricityFee()));
+                                        tvWaterLabel.setText("Tiền nước");
+                                        tvWaterValue.setText(String.format("%,d₫", i.getWaterFee()));
+                                        tvServiceLabel.setText("Phí dịch vụ");
+                                        tvServiceValue.setText(String.format("%,d₫", i.getServiceFee()));
+                                        tvParkingLabel.setText("Phí gửi xe");
+                                        tvParkingValue.setText(String.format("%,d₫", i.getParkingFee()));
+                                        tvTotalFee.setText(String.format("%,d₫", i.getTotalFee()));
+                                    }
                                 });
                     }
-                });
+
+                    // Disable if already paid
+                    if (c.isPaid()) btnMarkPaid.setEnabled(false);
+
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi tải chi tiết: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
     }
 
-    private String formatCurrency(long value) {
-        return String.format("%,d₫", value);
+    private void showFullScreenImage() {
+        if (imageUrl == null) return;
+        Dialog d = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        ImageView iv = new ImageView(this);
+        iv.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        Glide.with(this).load(Uri.parse(imageUrl)).into(iv);
+        d.setContentView(iv);
+        d.show();
+    }
+
+    private void markAsPaid() {
+        db.collection("contracts").document(contractId)
+                .update("isPaid", true)
+                .addOnSuccessListener(a -> {
+                    setResult(RESULT_OK);
+                    Toast.makeText(this, "Đã đánh dấu hợp đồng đã toán", Toast.LENGTH_SHORT).show();
+                    finish();  // <- Đóng detail để list tự reload
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi đánh dấu: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    private void confirmDeletion() {
+        new AlertDialog.Builder(this)
+                .setTitle("Xóa hợp đồng")
+                .setMessage("Bạn có chắc muốn xóa hợp đồng này không?")
+                .setPositiveButton("Xóa", (d,w) -> deleteContract())
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void deleteContract() {
+        db.collection("contracts").document(contractId)
+                .delete()
+                .addOnSuccessListener(a -> {
+                    setResult(RESULT_OK);
+                    Toast.makeText(this, "Đã xóa hợp đồng", Toast.LENGTH_SHORT).show();
+                    finish();  // <- Đóng detail để list tự reload
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
     }
 }
