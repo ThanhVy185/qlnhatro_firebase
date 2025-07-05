@@ -1,61 +1,93 @@
 package com.huflit.qlnhatro;
 
-/**
- * Model cho một hợp đồng.
- */
+import com.google.firebase.firestore.PropertyName;
+
 public class Contract {
     private String id;
+    private String contractCode;
     private String roomId;
-    private String roomNumber;
-    private String tenantId;
     private String tenantName;
+    private String identityNumber;
+    private long endDate;
+    private String imageUrl;
+    private String invoiceId;
+    private boolean isPaid;
 
-    private long rent;
-    private long deposit;
-    private long electricityFee;
-    private long waterFee;
-
-    private String startDate;
-    private String endDate;
-    private long createdAt;
-
-    // Firestore cần constructor không args
+    // Mandatory empty constructor for Firestore deserialization
     public Contract() {}
 
-    // Getters và setters
-    public String getId()               { return id; }
-    public void   setId(String id)      { this.id = id; }
+    // --- id ---
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getRoomId()           { return roomId; }
-    public void   setRoomId(String roomId) { this.roomId = roomId; }
+    // --- contractCode ---
+    public String getContractCode() {
+        return contractCode;
+    }
+    public void setContractCode(String contractCode) {
+        this.contractCode = contractCode;
+    }
 
-    public String getRoomNumber()       { return roomNumber; }
-    public void   setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
+    // --- roomId ---
+    public String getRoomId() {
+        return roomId;
+    }
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
 
-    public String getTenantId()         { return tenantId; }
-    public void   setTenantId(String tenantId) { this.tenantId = tenantId; }
+    // --- tenantName ---
+    public String getTenantName() {
+        return tenantName;
+    }
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
+    }
 
-    public String getTenantName()       { return tenantName; }
-    public void   setTenantName(String tenantName) { this.tenantName = tenantName; }
+    // --- identityNumber ---
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+    public void setIdentityNumber(String identityNumber) {
+        this.identityNumber = identityNumber;
+    }
 
-    public long   getRent()             { return rent; }
-    public void   setRent(long rent)    { this.rent = rent; }
+    // --- endDate ---
+    public long getEndDate() {
+        return endDate;
+    }
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
+    }
 
-    public long   getDeposit()          { return deposit; }
-    public void   setDeposit(long deposit) { this.deposit = deposit; }
+    // --- imageUrl ---
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
-    public long   getElectricityFee()   { return electricityFee; }
-    public void   setElectricityFee(long electricityFee) { this.electricityFee = electricityFee; }
+    // --- invoiceId ---
+    public String getInvoiceId() {
+        return invoiceId;
+    }
+    public void setInvoiceId(String invoiceId) {
+        this.invoiceId = invoiceId;
+    }
 
-    public long   getWaterFee()         { return waterFee; }
-    public void   setWaterFee(long waterFee) { this.waterFee = waterFee; }
+    // --- isPaid ---
+    @PropertyName("isPaid")
+    public boolean isPaid() {
+        return isPaid;
+    }
 
-    public String getStartDate()        { return startDate; }
-    public void   setStartDate(String startDate) { this.startDate = startDate; }
-
-    public String getEndDate()          { return endDate; }
-    public void   setEndDate(String endDate) { this.endDate = endDate; }
-
-    public long   getCreatedAt()        { return createdAt; }
-    public void   setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+    @PropertyName("isPaid")
+    public void setIsPaid(boolean isPaid) {
+        this.isPaid = isPaid;
+    }
 }

@@ -3,69 +3,63 @@ package com.huflit.qlnhatro;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
-public class ContractAdapter extends RecyclerView.Adapter<ContractAdapter.ContractViewHolder> {
-    public interface OnActionListener {
-        void onEdit(Contract contract);
-        void onDelete(Contract contract);
-    }
+public class ContractAdapter
+        extends RecyclerView.Adapter<ContractAdapter.VH> {
 
-    private final List<Contract> contracts;
-    private final OnActionListener listener;
+    private final List<Contract> items;
+    private final Map<String, String> roomNames;
+    private final Consumer<Contract> onItemClick;
 
-    public ContractAdapter(List<Contract> contracts, OnActionListener listener) {
-        this.contracts = contracts;
-        this.listener = listener;
+    public ContractAdapter(List<Contract> items,
+                           Map<String, String> roomNames,
+                           Consumer<Contract> onItemClick) {
+        this.items = items;
+        this.roomNames = roomNames;
+        this.onItemClick = onItemClick;
     }
 
     @NonNull
     @Override
-    public ContractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_contract, parent, false);
-        return new ContractViewHolder(view);
+        return new VH(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ContractViewHolder holder, int position) {
-        Contract contract = contracts.get(position);
-        holder.tvRoom.setText("Phòng: " + contract.getRoomNumber());
-        holder.tvTenant.setText("Người thuê: " + contract.getTenantName());
-        holder.tvDates.setText("Từ " + contract.getStartDate() + " đến " + contract.getEndDate());
-        holder.tvRent.setText("Giá thuê: " + contract.getRent());
-        holder.tvDeposit.setText("Cọc: " + contract.getDeposit());
-        holder.tvElec.setText("Điện: " + contract.getElectricityFee());
-        holder.tvWater.setText("Nước: " + contract.getWaterFee());
-
-        holder.btnEdit.setOnClickListener(v -> listener.onEdit(contract));
-        holder.btnDelete.setOnClickListener(v -> listener.onDelete(contract));
+    public void onBindViewHolder(@NonNull VH holder, int pos) {
+        Contract c = items.get(pos);
+        // Phòng X
+        holder.tvRoom.setText(
+                roomNames.getOrDefault(c.getRoomId(), "Phòng ?"));
+        // Trạng thái
+        holder.tvStatus.setText(
+                c.isPaid() ? "Đã thanh toán" : "Chưa thanh toán");
+        // Click chuyển detail
+        holder.itemView.setOnClickListener(v ->
+                onItemClick.accept(c));
     }
 
     @Override
     public int getItemCount() {
-        return contracts.size();
+        return items.size();
     }
 
-    static class ContractViewHolder extends RecyclerView.ViewHolder {
-        TextView tvRoom, tvTenant, tvDates, tvRent, tvDeposit, tvElec, tvWater;
-        ImageButton btnEdit, btnDelete;
-
-        ContractViewHolder(@NonNull View itemView) {
+    static class VH extends RecyclerView.ViewHolder {
+        TextView tvRoom, tvStatus;
+        VH(@NonNull View itemView) {
             super(itemView);
-            tvRoom    = itemView.findViewById(R.id.tvRoomLabel);
-            tvTenant  = itemView.findViewById(R.id.tvTenantLabel);
-            tvDates   = itemView.findViewById(R.id.tvDates);
-            tvRent    = itemView.findViewById(R.id.tvContractRent);
-            tvDeposit = itemView.findViewById(R.id.tvContractDeposit);
-            tvElec    = itemView.findViewById(R.id.tvContractElectricity);
-            tvWater   = itemView.findViewById(R.id.tvContractWater);
-            btnEdit   = itemView.findViewById(R.id.btnEditContract);
-            btnDelete = itemView.findViewById(R.id.btnDeleteContract);
+            tvRoom   = itemView.findViewById(R.id.tvContractRoom);
+            tvStatus = itemView.findViewById(R.id.tvContractStatus);
         }
     }
 }

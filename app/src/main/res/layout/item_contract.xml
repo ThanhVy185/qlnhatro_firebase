@@ -1,76 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#DDDDDD"
+    app:strokeWidth="1dp"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground">
 
-    <!-- Phòng và người thuê -->
-    <TextView
-        android:id="@+id/tvRoomLabel"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="30dp"/>
-    <TextView
-        android:id="@+id/tvTenantLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"/>
-
-    <!-- Ngày -->
-    <TextView
-        android:id="@+id/tvDates"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"/>
-
-    <!-- Giá thuê, cọc, điện, nước -->
-    <TextView
-        android:id="@+id/tvContractRent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"/>
-    <TextView
-        android:id="@+id/tvContractDeposit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"/>
-    <TextView
-        android:id="@+id/tvContractElectricity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"/>
-    <TextView
-        android:id="@+id/tvContractWater"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"/>
-
-    <!-- Nút Sửa / Xóa -->
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:padding="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
 
-        <ImageButton
-            android:id="@+id/btnEditContract"
-            android:src="@android:drawable/ic_menu_edit"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Sửa"
+        <!-- Phòng X -->
+        <TextView
+            android:id="@+id/tvContractRoom"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Phòng X"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121" />
+
+        <!-- Trạng thái hợp đồng -->
+        <TextView
+            android:id="@+id/tvContractStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="300dp"/>
-
-        <ImageButton
-            android:id="@+id/btnDeleteContract"
-            android:src="@android:drawable/ic_menu_delete"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Xóa"
-            android:layout_marginStart="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="300dp"/>
+            android:text="Chưa thanh toán"
+            android:textSize="14sp"
+            android:textColor="#757575" />
     </LinearLayout>
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

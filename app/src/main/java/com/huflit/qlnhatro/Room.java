@@ -6,10 +6,8 @@ public class Room {
     private String name;
     private int maxOccupancy;
 
-    // Firestore cần constructor không args
     public Room() {}
 
-    // Constructor mới với maxOccupancy
     public Room(String id, String number, String name, int maxOccupancy) {
         this.id = id;
         this.number = number;
@@ -17,9 +15,40 @@ public class Room {
         this.maxOccupancy = maxOccupancy;
     }
 
-    // getters
-    public String getId()            { return id; }
-    public String getNumber()        { return number; }
-    public String getName()          { return name; }
-    public int    getMaxOccupancy()  { return maxOccupancy; }
+    public String getId() {
+        return id;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getMaxOccupancy() {
+        return maxOccupancy;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMaxOccupancy(int maxOccupancy) {
+        this.maxOccupancy = maxOccupancy;
+    }
+
+    @Override
+    public String toString() {
+        return number;  // dùng cho Spinner hiển thị
+    }
 }

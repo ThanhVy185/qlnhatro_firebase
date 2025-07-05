@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Quyền truy cập Internet là cần thiết cho Firebase -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -15,19 +14,39 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Qlnhatro"
         tools:targetApi="31">
-
-
+        <activity
+            android:name=".Contract"
+            android:exported="false" />
+        <activity
+            android:name=".CreateContractActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateContractActivity.java"
+            android:exported="false" />
+        <activity
+            android:name=".ContractAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".ContractListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TenantAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".Tenant"
+            android:exported="false" />
+        <activity
+            android:name=".Room"
+            android:exported="false" />
         <activity
             android:name=".DangnhapActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
-
         <activity
             android:name=".DangkiActivity"
             android:exported="false" />
@@ -35,41 +54,17 @@
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-
-        <!-- Quản lý Phòng -->
+            android:name=".RoomAdapter"
+            android:exported="false" /> <!-- RoomManagementActivity bây giờ là Launcher -->
         <activity
             android:name=".RoomManagementActivity"
             android:exported="false" />
-
-        <!-- Quản lý Người thuê -->
         <activity
             android:name=".TenantManagementActivity"
-            android:exported="false" />
-
-        <!-- Quản lý Hợp đồng -->
+            android:exported="false" /> <!-- TestActivity không còn launcher -->
         <activity
-            android:name=".ContractListActivity"
+            android:name=".MainActivity"
             android:exported="false" />
-        <activity
-            android:name=".CreateContractActivity"
-            android:exported="false" />
-
-        <!-- Quản lý Hóa đơn -->
-        <activity
-            android:name=".HoaDonActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Hoadon_chitiet"
-            android:exported="false" />
-        <activity
-            android:name=".Tao_HoaDon"
-            android:exported="false" />
-
-        <!-- CÁC LỚP NHƯ Room, Tenant, RoomAdapter, ContractAdapter... -->
-        <!-- TUYỆT ĐỐI KHÔNG ĐƯỢC KHAI BÁO TẠI ĐÂY -->
-
     </application>
 
 </manifest>

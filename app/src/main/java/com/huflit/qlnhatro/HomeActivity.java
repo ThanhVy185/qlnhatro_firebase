@@ -19,9 +19,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home); // Đảm bảo bạn đang dùng layout mới
+        setContentView(R.layout.activity_home);
 
-        // Ánh xạ các View
         btnQLPhong = findViewById(R.id.btnQLPhong);
         btnQLHopDong = findViewById(R.id.btnQLHopDong);
         btnQLHoaDon = findViewById(R.id.btnQLHoaDon);
