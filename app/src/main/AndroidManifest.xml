@@ -14,30 +14,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Qlnhatro"
         tools:targetApi="31">
+       <activity android:name=".ContractManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ContractDetailActivity"
+            android:exported="false" />
+
+      
         <activity
             android:name=".Contract"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
-            android:name=".CreateContractActivity"
-            android:exported="false" />
+            android:name="Adapter.ContractAdapter"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
-            android:name=".CreateContractActivity.java"
-            android:exported="false" />
-        <activity
-            android:name=".ContractAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".ContractListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TenantAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".Tenant"
-            android:exported="false" />
-        <activity
-            android:name=".Room"
-            android:exported="false" />
+            android:name="Data.Room"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".DangnhapActivity"
             android:exported="true">
@@ -55,15 +50,19 @@
             android:exported="false" />
         <activity
             android:name=".RoomAdapter"
-            android:exported="false" /> <!-- RoomManagementActivity bây giờ là Launcher -->
+            android:exported="false"
+            tools:ignore="Instantiatable" /> <!-- RoomManagementActivity bây giờ là Launcher -->
         <activity
             android:name=".RoomManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".TenantManagementActivity"
-            android:exported="false" /> <!-- TestActivity không còn launcher -->
+            android:name=".HoaDonActivity"
+            android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Hoadon_chitiet"
+            android:exported="false" />
+        <activity
+            android:name=".Tao_HoaDon"
             android:exported="false" />
     </application>
 

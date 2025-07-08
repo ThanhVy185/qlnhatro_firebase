@@ -1,4 +1,4 @@
-package com.huflit.qlnhatro;
+package Data;
 
 public class Room {
     private String id;

@@ -34,6 +34,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import Adapter.ContractAdapter;
+import Data.Room;
+
 public class ContractManagementActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PICK_IMAGE = 1001;
     private static final SimpleDateFormat DATE_FORMAT =

@@ -1,4 +1,4 @@
-package com.huflit.qlnhatro;
+package Data;
 
 public class Constants {
     public static final long giadien = 3500;

@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/topNav"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:background="#7AD77B">
+    android:layout_height="120dp"
+    android:background="#7AD77B"
+    android:orientation="horizontal"
+    android:padding="12dp">
 
     <Button
         android:id="@+id/btnGoRooms"
         android:layout_width="0dp"
+        android:layout_height="91dp"
         android:layout_weight="1"
-        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:text="Phòng"
         android:textColor="@android:color/white"
-        android:background="@android:color/transparent"/>
+        android:textSize="18dp" />
 
     <Button
         android:id="@+id/btnGoTenants"
         android:layout_width="0dp"
+        android:layout_height="68dp"
         android:layout_weight="1"
-        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="center_horizontal"
         android:text="Người thuê"
         android:textColor="@android:color/white"
-        android:background="@android:color/transparent"/>
+        android:textSize="18dp" />
 
 </LinearLayout>

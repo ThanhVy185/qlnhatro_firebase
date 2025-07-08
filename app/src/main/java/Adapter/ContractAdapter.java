@@ -1,4 +1,4 @@
-package com.huflit.qlnhatro;
+package Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.huflit.qlnhatro.Contract;
+import com.huflit.qlnhatro.R;
 
 import java.util.List;
 import java.util.Map;

@@ -82,14 +82,14 @@ public class Hoadon_chitiet extends AppCompatActivity {
         double tongTien = tienPhong + tienDien + tienNuoc;
 
         // Hiển thị dữ liệu lên giao diện
-        txtMaPhg.setText("Phòng: " + maPhong);
-        txtTen.setText("Người thuê: " + tenNguoi);
-        txtSDT.setText("SĐT: " + sdt);
-        txtTienPhg.setText("Tiền phòng: " + String.format(Locale.getDefault(), "%,.0f VNĐ", tienPhong));
-        txtTienDien.setText("Tiền điện: " + String.format(Locale.getDefault(), "%,.0f VNĐ", tienDien));
-        txtNuoc.setText("Tiền nước: " + String.format(Locale.getDefault(), "%,.0f VNĐ", tienNuoc));
-        txtTong.setText("Tổng cộng: " + String.format(Locale.getDefault(), "%,.0f VNĐ", tongTien));
-        txtNgayLap.setText("Ngày lập: " + ngayLap);
+        txtMaPhg.setText( maPhong);
+        txtTen.setText( tenNguoi);
+        txtSDT.setText( sdt);
+        txtTienPhg.setText(  String.format(Locale.getDefault(), "%,.0f VNĐ", tienPhong));
+        txtTienDien.setText( String.format(Locale.getDefault(), "%,.0f VNĐ", tienDien));
+        txtNuoc.setText( String.format(Locale.getDefault(), "%,.0f VNĐ", tienNuoc));
+        txtTong.setText(  String.format(Locale.getDefault(), "%,.0f VNĐ", tongTien));
+        txtNgayLap.setText(ngayLap);
         txtTrangThaiThanhToan.setText(trangThai);
     }
 

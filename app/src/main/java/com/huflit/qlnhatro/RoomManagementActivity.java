@@ -11,6 +11,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.*;
 
+import Data.Room;
+
 public class RoomManagementActivity extends AppCompatActivity {
 
     private EditText etRoomNumber, etRoomName, etMaxOccupancy;

@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="paid_text_color">#2F855A</color> <!-- Xanh lá cây đậm -->
     <color name="unpaid_text_color">#C53030</color> <!-- Đỏ đậm -->
+    <color name="gray_light">#CCCCCC</color>
 </resources>
