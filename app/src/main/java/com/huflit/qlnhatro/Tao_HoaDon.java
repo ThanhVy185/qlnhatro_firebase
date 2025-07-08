@@ -3,6 +3,7 @@ package com.huflit.qlnhatro;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,88 +27,93 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import Data.Constants;
 import Data.HoaDon;
-import Data.Room; // Import lớp Room của bạn
+import Data.Room;
 
 public class Tao_HoaDon extends AppCompatActivity {
 
-    // --- KHAI BÁO BIẾN ---
     Spinner spinnerPhong;
-    EditText edtTienDien, edtTienNuoc, edtTienPhong;
-    TextView tvTongTien, tvTenNguoiThue, tvNgayLap;
+    EditText edtSoDien, edtSoNuoc, edtTienPhong;
+    TextView tvTongTien, tvTenNguoiThue, tvNgayLap, tvThanhTienDien, tvThanhTienNuoc;
     Button btnLuu, btnHuy;
 
     private String maPhong, tenNguoi, sdt, ngayLap;
     private double tienDien, tienNuoc, tienPhong;
+    private double soDien, soNuoc;
     private FirebaseFirestore db;
 
-    // --- VÒNG ĐỜI ACTIVITY ---
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tao_hoa_don);
-
         db = FirebaseFirestore.getInstance();
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
         addControls();
         setupInitialData();
         setupSpinner();
         handleEvents();
     }
 
-    // --- CÁC HÀM THIẾT LẬP & XỬ LÝ ---
-
     private void addControls() {
         spinnerPhong = findViewById(R.id.spinnerPhong);
-        edtTienDien = findViewById(R.id.edtTienDien);
-        edtTienNuoc = findViewById(R.id.edtTienNuoc);
+        edtSoDien = findViewById(R.id.edtTienDien);
+        edtSoNuoc = findViewById(R.id.edtTienNuoc);
         edtTienPhong = findViewById(R.id.edtTienPhong);
         tvTongTien = findViewById(R.id.tvTongTien);
         btnLuu = findViewById(R.id.btnLuuHoaDon);
         btnHuy = findViewById(R.id.btnThoat);
         tvTenNguoiThue = findViewById(R.id.tvTenNguoiThue);
         tvNgayLap = findViewById(R.id.tvNgayLap);
+        tvThanhTienDien = findViewById(R.id.tvThanhTienDien);
+        tvThanhTienNuoc = findViewById(R.id.tvDien);
     }
 
     private void setupInitialData() {
         ngayLap = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
         tvNgayLap.setText(ngayLap);
+        edtTienPhong.setText(String.valueOf(Constants.GIA_PHONG_CO_BAN));
         btnLuu.setEnabled(false);
     }
 
-    /**
-     * Tải danh sách phòng từ collection 'rooms' lên Spinner.
-     */
     private void setupSpinner() {
         db.collection("rooms").get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.isEmpty()) {
-                Toast.makeText(this, "Không tìm thấy phòng nào.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Không có dữ liệu phòng", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             ArrayList<Room> roomList = new ArrayList<>();
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                // TỰ ĐỘNG CHUYỂN DỮ LIỆU TỪ FIRESTORE SANG ĐỐI TƯỢNG ROOM
                 Room room = doc.toObject(Room.class);
                 if (room != null) {
-                    room.setId(doc.getId()); // Gán ID của tài liệu vào đối tượng room
+                    room.setId(doc.getId());
                     roomList.add(room);
                 }
             }
-
             ArrayAdapter<Room> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, roomList);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerPhong.setAdapter(adapter);
-
-        }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Lỗi khi tải danh sách phòng: " + e.getMessage(), Toast.LENGTH_LONG).show();
         });
+    }
+
+    private boolean validateInput() {
+        if (spinnerPhong.getSelectedItem() == null) {
+            Toast.makeText(this, "Vui lòng chọn một phòng", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(edtSoDien.getText().toString().trim())) {
+            edtSoDien.setError("Vui lòng nhập số điện");
+            return false;
+        }
+        if (TextUtils.isEmpty(edtSoNuoc.getText().toString().trim())) {
+            edtSoNuoc.setError("Vui lòng nhập số nước");
+            return false;
+        }
+        return true;
     }
 
     private void handleEvents() {
@@ -121,15 +127,18 @@ public class Tao_HoaDon extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         };
-        edtTienDien.addTextChangedListener(textWatcher);
-        edtTienNuoc.addTextChangedListener(textWatcher);
+        edtSoDien.addTextChangedListener(textWatcher);
+        edtSoNuoc.addTextChangedListener(textWatcher);
         edtTienPhong.addTextChangedListener(textWatcher);
 
         btnHuy.setOnClickListener(v -> finish());
 
         btnLuu.setOnClickListener(v -> {
+            if (!validateInput()) {
+                return;
+            }
             capNhatTongTien();
-            HoaDon hoaDon = new HoaDon(maPhong, tenNguoi, sdt, tienPhong, tienDien, tienNuoc, ngayLap, "Chưa thanh toán");
+            HoaDon hoaDon = new HoaDon(maPhong, tenNguoi, sdt, tienPhong, tienDien, tienNuoc, ngayLap, "Chưa thanh toán", soDien, soNuoc);
             LuuHoaDonLenFirestore(hoaDon);
         });
 
@@ -138,32 +147,25 @@ public class Tao_HoaDon extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Room selectedRoom = (Room) parent.getItemAtPosition(position);
                 String selectedRoomId = selectedRoom.getId();
-                // LẤY SỐ PHÒNG TỪ `getNumber()` THEO ĐÚNG ĐỊNH NGHĨA CLASS ROOM
                 maPhong = selectedRoom.getNumber();
-
                 db.collection("contracts").whereEqualTo("roomId", selectedRoomId).limit(1).get()
                         .addOnSuccessListener(queryDocumentSnapshots -> {
                             if (!queryDocumentSnapshots.isEmpty()) {
                                 DocumentSnapshot contractDoc = queryDocumentSnapshots.getDocuments().get(0);
                                 tenNguoi = contractDoc.getString("tenantName");
-
                                 if (tenNguoi != null && !tenNguoi.trim().isEmpty()) {
-                                    tvTenNguoiThue.setText("Người thuê: " + tenNguoi);
+                                    tvTenNguoiThue.setText(tenNguoi);
                                     btnLuu.setEnabled(true);
                                 } else {
-                                    tvTenNguoiThue.setText("Phòng này chưa có hợp đồng");
+                                    tvTenNguoiThue.setText("Phòng này chưa có người thuê");
                                     btnLuu.setEnabled(false);
                                 }
                             } else {
                                 tvTenNguoiThue.setText("Không có hợp đồng cho phòng này");
                                 btnLuu.setEnabled(false);
                             }
-                        }).addOnFailureListener(e -> {
-                            Toast.makeText(Tao_HoaDon.this, "Lỗi khi tìm hợp đồng.", Toast.LENGTH_SHORT).show();
-                            btnLuu.setEnabled(false);
                         });
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 btnLuu.setEnabled(false);
@@ -172,28 +174,36 @@ public class Tao_HoaDon extends AppCompatActivity {
     }
 
     private void capNhatTongTien() {
-        String tienDienStr = edtTienDien.getText().toString().trim();
-        String tienNuocStr = edtTienNuoc.getText().toString().trim();
+        String soDienStr = edtSoDien.getText().toString().trim();
+        String soNuocStr = edtSoNuoc.getText().toString().trim();
         String tienPhongStr = edtTienPhong.getText().toString().trim();
+
         try {
-            tienDien = tienDienStr.isEmpty() ? 0 : Double.parseDouble(tienDienStr);
-            tienNuoc = tienNuocStr.isEmpty() ? 0 : Double.parseDouble(tienNuocStr);
-            tienPhong = tienPhongStr.isEmpty() ? 0 : Double.parseDouble(tienPhongStr);
+            this.soDien = soDienStr.isEmpty() ? 0 : Double.parseDouble(soDienStr);
+            this.soNuoc = soNuocStr.isEmpty() ? 0 : Double.parseDouble(soNuocStr);
+            this.tienPhong = tienPhongStr.isEmpty() ? 0 : Double.parseDouble(tienPhongStr);
+            this.tienDien = this.soDien * Constants.GIA_DIEN;
+            this.tienNuoc = this.soNuoc * Constants.GIA_NUOC;
         } catch (NumberFormatException e) {
-            tienDien = 0;
-            tienNuoc = 0;
-            tienPhong = 0;
+            this.tienDien = this.tienNuoc = this.tienPhong = 0;
         }
+
+        tvThanhTienDien.setText(String.format(Locale.getDefault(), "Thành tiền: %,.0f VNĐ", tienDien));
+        tvThanhTienNuoc.setText(String.format(Locale.getDefault(), "Thành tiền: %,.0f VNĐ", tienNuoc));
+
         double tong = tienDien + tienNuoc + tienPhong;
         tvTongTien.setText(String.format(Locale.getDefault(), "%,.0f VNĐ", tong));
     }
 
     private void LuuHoaDonLenFirestore(HoaDon hoaDon) {
+        btnLuu.setEnabled(false); // Vô hiệu hóa nút Lưu để tránh nhấn nhiều lần
+
         db.collection("HoaDon").add(hoaDon).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Lưu hóa đơn thành công!", Toast.LENGTH_SHORT).show();
-            finish();
+            finish(); // Quay về màn hình trước đó
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Lỗi khi lưu hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            btnLuu.setEnabled(true); // Bật lại nút Lưu nếu có lỗi
         });
     }
 }

@@ -1,117 +1,79 @@
+// File: Data/HoaDon.java
 package Data;
 
-import com.google.firebase.firestore.Exclude;
-
 public class HoaDon {
-    // Các trường dữ liệu sẽ được lưu trên Firestore
+    private String id; // Trường này dùng để lưu ID từ Firestore
+
     private String maPhong;
-    private String tenNguoi;
+    private String tenNguoiThue;
     private String sdt;
     private double tienPhong;
     private double tienDien;
     private double tienNuoc;
-    private String ngayLapHoaDon;
+    private String ngayLap;
     private String trangThai;
+    private double soDien; // kWh
+    private double soNuoc; // m³
 
-    // THÊM TRƯỜNG NÀY: Dùng để lưu ID của document khi đọc từ Firestore,
-    // nhưng không lưu ngược lại vào document.
-    @Exclude
-    private String documentId;
+    // Constructor rỗng cần cho Firestore
+    public HoaDon() {}
 
-    // Constructor mặc định (Bắt buộc phải có cho Firebase)
-    public HoaDon() {
-    }
-
-    // Constructor có tham số (Đã sửa lại thứ tự cho đúng)
-    public HoaDon(String maPhong, String tenNguoi, String sdt, double tienPhong, double tienDien, double tienNuoc, String ngayLapHoaDon, String trangThai) {
+    // Constructor đầy đủ
+    public HoaDon(String maPhong, String tenNguoiThue, String sdt, double tienPhong, double tienDien, double tienNuoc, String ngayLap, String trangThai, double soDien, double soNuoc) {
         this.maPhong = maPhong;
-        this.tenNguoi = tenNguoi;
+        this.tenNguoiThue = tenNguoiThue;
         this.sdt = sdt;
         this.tienPhong = tienPhong;
         this.tienDien = tienDien;
         this.tienNuoc = tienNuoc;
-        this.ngayLapHoaDon = ngayLapHoaDon;
+        this.ngayLap = ngayLap;
         this.trangThai = trangThai;
+        this.soDien = soDien;
+        this.soNuoc = soNuoc;
     }
 
-    // --- THÊM GETTER VÀ SETTER CHO DOCUMENT ID ---
-    public String getDocumentId() {
-        return documentId;
+    // --- GETTERS AND SETTERS ĐẦY ĐỦ ---
+
+    public String getMaPhong() { return maPhong; }
+    public void setMaPhong(String maPhong) { this.maPhong = maPhong; }
+
+    public String getTenNguoiThue() { return tenNguoiThue; }
+    public void setTenNguoiThue(String tenNguoiThue) { this.tenNguoiThue = tenNguoiThue; }
+
+    public String getSdt() { return sdt; }
+    public void setSdt(String sdt) { this.sdt = sdt; }
+
+    public double getTienPhong() { return tienPhong; }
+    public void setTienPhong(double tienPhong) { this.tienPhong = tienPhong; }
+
+    public double getTienDien() { return tienDien; }
+    public void setTienDien(double tienDien) { this.tienDien = tienDien; }
+
+    public double getTienNuoc() { return tienNuoc; }
+    public void setTienNuoc(double tienNuoc) { this.tienNuoc = tienNuoc; }
+
+    public String getNgayLap() { return ngayLap; }
+    public void setNgayLap(String ngayLap) { this.ngayLap = ngayLap; }
+
+    public String getTrangThai() { return trangThai; }
+    public void setTrangThai(String trangThai) { this.trangThai = trangThai; }
+
+    public double getSoDien() { return soDien; }
+    public void setSoDien(double soDien) { this.soDien = soDien; }
+
+    public double getSoNuoc() { return soNuoc; }
+    public void setSoNuoc(double soNuoc) { this.soNuoc = soNuoc; }
+
+    public String getId() {
+        return id;
     }
 
-    public void setDocumentId(String documentId) {
-        this.documentId = documentId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    // --- CÁC GETTER VÀ SETTER CÒN LẠI ---
-    // (Tôi đã bỏ @Exclude khỏi maPhong)
-    public String getMaPhong() {
-        return maPhong;
-    }
 
-    public void setMaPhong(String maPhong) {
-        this.maPhong = maPhong;
-    }
 
-    public String getTenNguoi() {
-        return tenNguoi;
-    }
 
-    public void setTenNguoi(String tenNguoi) {
-        this.tenNguoi = tenNguoi;
-    }
 
-    public String getSdt() {
-        return sdt;
-    }
-
-    public void setSdt(String sdt) {
-        this.sdt = sdt;
-    }
-
-    public double getTienPhong() {
-        return tienPhong;
-    }
-
-    public void setTienPhong(double tienPhong) {
-        this.tienPhong = tienPhong;
-    }
-
-    public double getTienDien() {
-        return tienDien;
-    }
-
-    public void setTienDien(double tienDien) {
-        this.tienDien = tienDien;
-    }
-
-    public double getTienNuoc() {
-        return tienNuoc;
-    }
-
-    public void setTienNuoc(double tienNuoc) {
-        this.tienNuoc = tienNuoc;
-    }
-
-    public String getNgayLapHoaDon() {
-        return ngayLapHoaDon;
-    }
-
-    public void setNgayLapHoaDon(String ngayLapHoaDon) {
-        this.ngayLapHoaDon = ngayLapHoaDon;
-    }
-
-    public String getTrangThai() {
-        return trangThai;
-    }
-
-    public void setTrangThai(String trangThai) {
-        this.trangThai = trangThai;
-    }
-
-    // Hàm tính tổng tiền
-    @Exclude // Không cần lưu tổng tiền vào database vì có thể tính toán được
-    public double TongTien() {
-        return tienDien + tienNuoc + tienPhong;
-    }
 }

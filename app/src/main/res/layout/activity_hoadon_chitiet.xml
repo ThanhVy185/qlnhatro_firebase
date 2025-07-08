@@ -8,7 +8,6 @@
     android:background="#F7F8FA"
     tools:context=".Hoadon_chitiet">
 
-    <!-- Header -->
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -36,7 +35,6 @@
         app:srcCompat="@drawable/img_close" />
 
 
-    <!-- Khung viền chính chứa toàn bộ nội dung -->
     <LinearLayout
         android:id="@+id/card_view"
         android:layout_width="0dp"
@@ -52,7 +50,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
 
-        <!-- Thông tin người thuê -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -156,7 +153,6 @@
         </RelativeLayout>
 
 
-        <!-- Đường kẻ phân cách -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -164,7 +160,6 @@
             android:layout_marginBottom="24dp"
             android:background="#E2E8F0" />
 
-        <!-- Chi tiết thanh toán -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -196,54 +191,85 @@
                 tools:text="2,500,000 VNĐ" />
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
+                android:layout_weight="1"
                 android:text="Tiền điện"
                 android:textColor="#4A5568"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/txtTienDien"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:textColor="#1A202C"
-                android:textSize="16sp"
-                tools:text="150,000 VNĐ" />
-        </RelativeLayout>
+                android:gravity="end"
+                android:orientation="vertical">
 
-        <RelativeLayout
+                <TextView
+                    android:id="@+id/txtTienDien"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1A202C"
+                    android:textSize="16sp"
+                    tools:text="150,000 VNĐ" />
+
+                <TextView
+                    android:id="@+id/txtChiTietDien"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#718096"
+                    android:textSize="12sp"
+                    tools:text="(42 kWh)" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
+                android:layout_weight="1"
                 android:text="Tiền nước"
                 android:textColor="#4A5568"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/txtNuoc"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:textColor="#1A202C"
-                android:textSize="16sp"
-                tools:text="80,000 VNĐ" />
-        </RelativeLayout>
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNuoc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1A202C"
+                    android:textSize="16sp"
+                    tools:text="80,000 VNĐ" />
+
+                <TextView
+                    android:id="@+id/txtChiTietNuoc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#718096"
+                    android:textSize="12sp"
+                    tools:text="(5 m³)" />
+            </LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Khung Tổng tiền và Trạng thái -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -287,7 +313,7 @@
         <TextView
             android:id="@+id/txtTrangThaiThanhToan"
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_status_unpaid"

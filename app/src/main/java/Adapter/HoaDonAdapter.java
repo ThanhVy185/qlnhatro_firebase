@@ -14,7 +14,6 @@ import Data.HoaDon;
 
 public class HoaDonAdapter extends BaseAdapter {
     private Context context;
-    // SỬA LỖI: Không dùng static cho danh sách để tránh lỗi và rò rỉ bộ nhớ.
     private List<HoaDon> hoaDonList;
 
     public HoaDonAdapter(Context context, List<HoaDon> hoaDonList) {
@@ -24,7 +23,6 @@ public class HoaDonAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        // Trả về 0 nếu list là null để tránh crash.
         return hoaDonList != null ? hoaDonList.size() : 0;
     }
 
@@ -38,7 +36,6 @@ public class HoaDonAdapter extends BaseAdapter {
         return position;
     }
 
-    // ViewHolder với các ID đã được đồng bộ
     static class ViewHolder {
         TextView txtPhong;
         TextView txtTien;
@@ -51,11 +48,9 @@ public class HoaDonAdapter extends BaseAdapter {
         ViewHolder holder;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            // Giả sử layout của bạn là list_item_hoadon.xml như chúng ta đã thiết kế
             convertView = inflater.inflate(R.layout.item_hoadon, parent, false);
 
             holder = new ViewHolder();
-            // Ánh xạ ID từ file layout
             holder.txtPhong = convertView.findViewById(R.id.txtPhong);
             holder.txtTien = convertView.findViewById(R.id.txtTien);
             holder.txtNgay = convertView.findViewById(R.id.txtNgay);
@@ -69,13 +64,16 @@ public class HoaDonAdapter extends BaseAdapter {
 
         // Gán dữ liệu
         holder.txtPhong.setText("Phòng: " + hd.getMaPhong());
-        holder.txtNgay.setText("Ngày lập: " + hd.getNgayLapHoaDon());
-        holder.txtTien.setText(String.format(Locale.getDefault(), "Tổng tiền: %,.0fđ", hd.TongTien()));
+        holder.txtNgay.setText("Ngày lập: " + hd.getNgayLap());
+
+        // SỬA LỖI: Tính tổng tiền thủ công
+        double tongTien = hd.getTienPhong() + hd.getTienDien() + hd.getTienNuoc();
+        holder.txtTien.setText(String.format(Locale.getDefault(), "Tổng tiền: %,.0fđ", tongTien));
 
         String trangThai = hd.getTrangThai();
         holder.txtTrangThai.setText(trangThai);
 
-        // *** THÊM LẠI LOGIC ĐỔI MÀU BỊ THIẾU ***
+        // Đổi màu dựa trên trạng thái
         if ("Đã thanh toán".equalsIgnoreCase(trangThai)) {
             holder.txtTrangThai.setBackground(ContextCompat.getDrawable(context, R.drawable.bg_status_paid));
             holder.txtTrangThai.setTextColor(ContextCompat.getColor(context, R.color.paid_text_color));

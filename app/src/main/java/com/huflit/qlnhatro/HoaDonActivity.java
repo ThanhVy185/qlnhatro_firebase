@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -39,8 +38,6 @@ public class HoaDonActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private ListenerRegistration firestoreListener;
     private static boolean isSeeding = false;
-
-    // Biến để lưu vị trí của hóa đơn được chọn
     private int selectedPosition = -1;
 
     @SuppressLint("MissingInflatedId")
@@ -87,20 +84,11 @@ public class HoaDonActivity extends AppCompatActivity {
     }
 
     private void seedDataIfEmpty() {
-        if (isSeeding) {
-            return;
-        }
+        if (isSeeding) return;
         db.collection("HoaDon").limit(1).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult().isEmpty()) {
-                    isSeeding = true;
-                    Log.d("FirestoreSeed", "Collection 'HoaDon' is empty. Seeding data...");
-                    addSampleDataToFirestore();
-                } else {
-                    Log.d("FirestoreSeed", "Collection 'HoaDon' already has data. No need to seed.");
-                }
-            } else {
-                Log.w("FirestoreSeed", "Error checking for existing data.", task.getException());
+            if (task.isSuccessful() && task.getResult().isEmpty()) {
+                isSeeding = true;
+                addSampleDataToFirestore();
             }
         });
     }
@@ -108,27 +96,22 @@ public class HoaDonActivity extends AppCompatActivity {
     private void addSampleDataToFirestore() {
         WriteBatch batch = db.batch();
         ArrayList<HoaDon> sampleList = new ArrayList<>();
-        sampleList.add(new HoaDon("P101", "Nguyễn Văn An", "0911111111", 2500000, 150000, 80000, "25/07/2025", "Chưa thanh toán"));
-        sampleList.add(new HoaDon("P102", "Trần Thị Bình", "0922222222", 3000000, 200000, 100000, "24/07/2025", "Đã thanh toán"));
-        sampleList.add(new HoaDon("P103", "Lê Văn Cường", "0933333333", 2700000, 175000, 90000, "23/07/2025", "Chưa thanh toán"));
+        sampleList.add(new HoaDon("P101", "Nguyễn Văn An", "0911111111", 2500000, 150000, 80000, "25/07/2025", "Chưa thanh toán", 42.8, 5.3));
+        sampleList.add(new HoaDon("P102", "Trần Thị Bình", "0922222222", 3000000, 200000, 100000, "24/07/2025", "Đã thanh toán", 57.1, 6.6));
+        sampleList.add(new HoaDon("P103", "Lê Văn Cường", "0933333333", 2700000, 175000, 90000, "23/07/2025", "Chưa thanh toán", 50.0, 6.0));
         for (HoaDon hoaDon : sampleList) {
             DocumentReference docRef = db.collection("HoaDon").document();
             batch.set(docRef, hoaDon);
         }
         batch.commit().addOnSuccessListener(aVoid -> {
-            Log.d("FirestoreSeed", "Successfully added sample data.");
-            Toast.makeText(HoaDonActivity.this, "Đã tự động thêm dữ liệu mẫu lên Firebase!", Toast.LENGTH_LONG).show();
             isSeeding = false;
         }).addOnFailureListener(e -> {
-            Log.w("FirestoreSeed", "Error adding sample data.", e);
-            Toast.makeText(HoaDonActivity.this, "Lỗi khi thêm dữ liệu mẫu.", Toast.LENGTH_SHORT).show();
             isSeeding = false;
         });
     }
 
     private void listenForDataChanges() {
-        Query query = db.collection("HoaDon");
-        firestoreListener = query.addSnapshotListener((snapshots, e) -> {
+        firestoreListener = db.collection("HoaDon").addSnapshotListener((snapshots, e) -> {
             if (e != null) {
                 Log.w("Firestore", "Listen failed.", e);
                 return;
@@ -137,12 +120,14 @@ public class HoaDonActivity extends AppCompatActivity {
             if (snapshots != null) {
                 for (QueryDocumentSnapshot doc : snapshots) {
                     HoaDon hoaDon = doc.toObject(HoaDon.class);
-                    hoaDon.setDocumentId(doc.getId());
+
+                    // SỬA LỖI DUY NHẤT Ở ĐÂY: Dùng đúng setId()
+                    hoaDon.setId(doc.getId());
+
                     listHD.add(hoaDon);
                 }
             }
             hoaDonAdapter.notifyDataSetChanged();
-            Log.d("Firestore", "Data updated. Items count: " + listHD.size());
         });
     }
 
@@ -152,65 +137,52 @@ public class HoaDonActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Sự kiện nhấn vào một item để CHỌN
         lvHoaDon.setOnItemClickListener((adapterView, itemView, position, id) -> {
             selectedPosition = position;
             Toast.makeText(HoaDonActivity.this, "Đã chọn: " + listHD.get(position).getMaPhong(), Toast.LENGTH_SHORT).show();
-            // Để làm nổi bật item được chọn, bạn cần tùy chỉnh lại Adapter
         });
 
-        // Sự kiện nhấn giữ một item để XEM CHI TIẾT
         lvHoaDon.setOnItemLongClickListener((parent, view, position, id) -> {
             HoaDon hd = listHD.get(position);
             Intent intent = new Intent(HoaDonActivity.this, Hoadon_chitiet.class);
-            intent.putExtra("documentId", hd.getDocumentId());
+            intent.putExtra("documentId", hd.getId());
             intent.putExtra("maPhong", hd.getMaPhong());
-            intent.putExtra("tenNguoi", hd.getTenNguoi());
+            intent.putExtra("tenNguoi", hd.getTenNguoiThue());
             intent.putExtra("sdt", hd.getSdt());
             intent.putExtra("tienPhong", hd.getTienPhong());
             intent.putExtra("tienDien", hd.getTienDien());
             intent.putExtra("tienNuoc", hd.getTienNuoc());
-            intent.putExtra("ngayLap", hd.getNgayLapHoaDon());
+            intent.putExtra("ngayLap", hd.getNgayLap());
             intent.putExtra("trangThai", hd.getTrangThai());
+            intent.putExtra("soDien", hd.getSoDien());
+            intent.putExtra("soNuoc", hd.getSoNuoc());
             startActivity(intent);
-            return true; // Đánh dấu sự kiện đã được xử lý
+            return true;
         });
 
-        // Sự kiện cho nút XÓA
         btnDelete.setOnClickListener(v -> {
             if (selectedPosition == -1) {
                 Toast.makeText(this, "Vui lòng chọn một hóa đơn để xóa", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            // Hiển thị hộp thoại xác nhận
             new AlertDialog.Builder(this)
                     .setTitle("Xác nhận xóa")
                     .setMessage("Bạn có chắc chắn muốn xóa hóa đơn cho phòng " + listHD.get(selectedPosition).getMaPhong() + "?")
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton("Xóa", (dialog, which) -> {
-                        // Nếu người dùng đồng ý, gọi hàm xóa
-                        deleteSelectedHoaDon();
-                    })
-                    .setNegativeButton("Hủy", null) // Không làm gì khi nhấn Hủy
+                    .setPositiveButton("Xóa", (dialog, which) -> deleteSelectedHoaDon())
+                    .setNegativeButton("Hủy", null)
                     .show();
         });
     }
 
-    /**
-     * Xóa hóa đơn đã chọn khỏi Firestore.
-     */
     private void deleteSelectedHoaDon() {
-        if (selectedPosition < 0 || selectedPosition >= listHD.size()) {
-            return; // Vị trí không hợp lệ
-        }
-        String documentId = listHD.get(selectedPosition).getDocumentId();
+        if (selectedPosition < 0 || selectedPosition >= listHD.size()) return;
+        String documentId = listHD.get(selectedPosition).getId();
         db.collection("HoaDon").document(documentId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Đã xóa hóa đơn thành công", Toast.LENGTH_SHORT).show();
-                    selectedPosition = -1; // Bỏ chọn sau khi xóa
-                    // Listener sẽ tự động cập nhật lại danh sách
+                    selectedPosition = -1;
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Lỗi khi xóa hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();

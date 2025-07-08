@@ -1,141 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".Tao_HoaDon">
-
-    <TextView
-        android:id="@+id/tvChonPhong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Chọn phòng:"
-        android:textSize="16sp" />
-
-    <Spinner
-        android:id="@+id/spinnerPhong"
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
-
-    <TextView
-        android:id="@+id/tvNguoiThue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Tên người thuê:"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tvTenNguoiThue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#EEEEEE"
-        android:padding="8dp"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tvNgayLapLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Ngày lập:"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tvNgayLap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#EEEEEE"
-        android:padding="8dp"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tvTienDien"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Tiền điện:"
-        android:textSize="16sp" />
-
-    <EditText
-        android:id="@+id/edtTienDien"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nhập tiền điện"
-        android:inputType="numberDecimal" />
-
-    <TextView
-        android:id="@+id/tvTienNuoc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Tiền nước:"
-        android:textSize="16sp" />
-
-    <EditText
-        android:id="@+id/edtTienNuoc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nhập tiền nước"
-        android:inputType="numberDecimal" />
-
-    <TextView
-        android:id="@+id/tvTienPhong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Tiền phòng:"
-        android:textSize="16sp" />
-
-    <EditText
-        android:id="@+id/edtTienPhong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nhập tiền phòng"
-        android:inputType="numberDecimal" />
-
-    <TextView
-        android:id="@+id/tvTongTienLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Tổng tiền:"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tvTongTien"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#DDF1DD"
-        android:padding="8dp"
-        android:text="0"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+    android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".Tao_HoaDon">
 
-        <Button
-            android:id="@+id/btnLuuHoaDon"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tvChonPhong"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:text="Lưu hóa đơn" />
+            android:text="Chọn phòng:"
+            android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/btnThoat"
-            android:layout_width="0dp"
+        <Spinner
+            android:id="@+id/spinnerPhong"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/tvNguoiThue"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="Thoát" />
+            android:layout_marginTop="16dp"
+            android:text="Tên người thuê:"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvTenNguoiThue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EEEEEE"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvNgayLapLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Ngày lập:"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvNgayLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EEEEEE"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvTienDien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Số điện sử dụng (kWh):"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/edtTienDien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số kWh đã dùng"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:id="@+id/tvThanhTienDien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="Thành tiền: 0 VNĐ"
+            android:textColor="@color/black"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/tvTienNuoc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Số nước sử dụng (m³):"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/edtTienNuoc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số m³ đã dùng"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:id="@+id/tvDien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="Thành tiền: 0 VNĐ"
+            android:textColor="@color/black"
+            android:textStyle="italic" />
+
+
+        <TextView
+            android:id="@+id/tvTienPhong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tiền phòng:"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/edtTienPhong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập tiền phòng"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:id="@+id/tvTongTienLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Tổng tiền:"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvTongTien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDF1DD"
+            android:padding="12dp"
+            android:textAlignment="center"
+            android:text="0 VNĐ"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnLuuHoaDon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="Lưu hóa đơn" />
+
+            <Button
+                android:id="@+id/btnThoat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Thoát" />
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
