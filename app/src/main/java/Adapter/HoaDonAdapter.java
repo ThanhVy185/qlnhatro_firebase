@@ -1,6 +1,7 @@
 package Adapter;
 
 import android.content.Context;
+import android.graphics.Color; // Thêm import
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,17 @@ import Data.HoaDon;
 public class HoaDonAdapter extends BaseAdapter {
     private Context context;
     private List<HoaDon> hoaDonList;
+    private int selectedPosition = -1; // Biến để lưu vị trí item được chọn
 
     public HoaDonAdapter(Context context, List<HoaDon> hoaDonList) {
         this.context = context;
         this.hoaDonList = hoaDonList;
+    }
+
+    // << THÊM HÀM NÀY >>
+    // Hàm để activity có thể set vị trí được chọn từ bên ngoài
+    public void setSelectedPosition(int position) {
+        this.selectedPosition = position;
     }
 
     @Override
@@ -62,24 +70,30 @@ public class HoaDonAdapter extends BaseAdapter {
 
         HoaDon hd = hoaDonList.get(position);
 
-        // Gán dữ liệu
         holder.txtPhong.setText("Phòng: " + hd.getMaPhong());
         holder.txtNgay.setText("Ngày lập: " + hd.getNgayLap());
 
-        // SỬA LỖI: Tính tổng tiền thủ công
         double tongTien = hd.getTienPhong() + hd.getTienDien() + hd.getTienNuoc();
         holder.txtTien.setText(String.format(Locale.getDefault(), "Tổng tiền: %,.0fđ", tongTien));
 
         String trangThai = hd.getTrangThai();
         holder.txtTrangThai.setText(trangThai);
 
-        // Đổi màu dựa trên trạng thái
         if ("Đã thanh toán".equalsIgnoreCase(trangThai)) {
             holder.txtTrangThai.setBackground(ContextCompat.getDrawable(context, R.drawable.bg_status_paid));
             holder.txtTrangThai.setTextColor(ContextCompat.getColor(context, R.color.paid_text_color));
         } else {
             holder.txtTrangThai.setBackground(ContextCompat.getDrawable(context, R.drawable.bg_status_unpaid));
             holder.txtTrangThai.setTextColor(ContextCompat.getColor(context, R.color.unpaid_text_color));
+        }
+
+        // << THÊM ĐOẠN CODE NÀY ĐỂ ĐỔI MÀU NỀN >>
+        // Nếu vị trí hiện tại khớp với vị trí đã chọn, đổi màu nền
+        if (position == selectedPosition) {
+                convertView.setBackgroundColor(ContextCompat.getColor(context, R.color.selected_item_color)); // Bạn cần định nghĩa màu này trong file colors.xml
+        } else {
+            // Nếu không thì dùng màu nền mặc định (trong suốt)
+            convertView.setBackgroundColor(Color.TRANSPARENT);
         }
 
         return convertView;

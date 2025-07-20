@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="2dp"
+    android:foreground="?android:attr/selectableItemBackgroundBorderless">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <!-- Icon hợp đồng -->
+        <ImageView
+            android:id="@+id/ivContractIcon"
+            android:layout_width="105dp"
+            android:layout_height="80dp"
+            app:srcCompat="@drawable/img_home"
+
+            />
+
+        <!-- Chỉ hiển thị tên phòng -->
+        <TextView
+            android:id="@+id/tvRoomLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:paddingBottom="4dp"
+            android:text="Phòng 101"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>

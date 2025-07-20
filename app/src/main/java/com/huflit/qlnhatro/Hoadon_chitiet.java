@@ -18,7 +18,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Locale;
 
 public class Hoadon_chitiet extends AppCompatActivity {
-    // <<< Khai báo thêm 2 TextView chi tiết
     TextView txtMaPhg, txtTen, txtSDT, txtTienPhg, txtTienDien, txtNuoc, txtTong, txtNgayLap, txtTrangThaiThanhToan, txtChiTietDien, txtChiTietNuoc;
     ImageView imgClose;
 
@@ -57,8 +56,6 @@ public class Hoadon_chitiet extends AppCompatActivity {
         txtTong = findViewById(R.id.txtTong);
         txtNgayLap = findViewById(R.id.txtNgayLap);
         txtTrangThaiThanhToan = findViewById(R.id.txtTrangThaiThanhToan);
-
-        // <<< Ánh xạ các TextView mới từ layout
         txtChiTietDien = findViewById(R.id.txtChiTietDien);
         txtChiTietNuoc = findViewById(R.id.txtChiTietNuoc);
     }
@@ -77,14 +74,10 @@ public class Hoadon_chitiet extends AppCompatActivity {
         double tienPhong = intent.getDoubleExtra("tienPhong", 0.0);
         double tienDien = intent.getDoubleExtra("tienDien", 0.0);
         double tienNuoc = intent.getDoubleExtra("tienNuoc", 0.0);
-
-        // <<< Nhận thêm dữ liệu về số lượng điện, nước đã dùng
         double soDien = intent.getDoubleExtra("soDien", 0.0);
         double soNuoc = intent.getDoubleExtra("soNuoc", 0.0);
-
         double tongTien = tienPhong + tienDien + tienNuoc;
 
-        // Hiển thị dữ liệu lên giao diện
         txtMaPhg.setText(maPhong);
         txtTen.setText(tenNguoi);
         txtSDT.setText(sdt);
@@ -94,8 +87,6 @@ public class Hoadon_chitiet extends AppCompatActivity {
         txtTong.setText(String.format(Locale.getDefault(), "%,.0f VNĐ", tongTien));
         txtNgayLap.setText(ngayLap);
         txtTrangThaiThanhToan.setText(trangThai);
-
-        // <<< Hiển thị chi tiết số điện, nước lên các TextView mới
         txtChiTietDien.setText(String.format(Locale.getDefault(), "(%.1f kWh)", soDien));
         txtChiTietNuoc.setText(String.format(Locale.getDefault(), "(%.1f m³)", soNuoc));
     }
@@ -103,10 +94,10 @@ public class Hoadon_chitiet extends AppCompatActivity {
     private void handleEvents() {
         imgClose.setOnClickListener(v -> finish());
 
+        // Xử lý sự kiện khi nhấn vào trạng thái thanh toán
         txtTrangThaiThanhToan.setOnClickListener(v -> {
             String currentStatus = txtTrangThaiThanhToan.getText().toString();
             String newStatus = currentStatus.equals("Chưa thanh toán") ? "Đã thanh toán" : "Chưa thanh toán";
-
             updatePaymentStatus(newStatus);
         });
     }
@@ -119,6 +110,7 @@ public class Hoadon_chitiet extends AppCompatActivity {
 
         DocumentReference hoaDonRef = db.collection("HoaDon").document(documentId);
 
+        // Cập nhật trường "trangThai" trên Firestore
         hoaDonRef.update("trangThai", newStatus)
                 .addOnSuccessListener(aVoid -> {
                     txtTrangThaiThanhToan.setText(newStatus);

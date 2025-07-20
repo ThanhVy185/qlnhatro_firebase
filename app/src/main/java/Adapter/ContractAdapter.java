@@ -3,66 +3,73 @@ package Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.huflit.qlnhatro.Contract;
 import com.huflit.qlnhatro.R;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+
+import com.huflit.qlnhatro.Contract;
 
 public class ContractAdapter
-        extends RecyclerView.Adapter<ContractAdapter.VH> {
+        extends RecyclerView.Adapter<ContractAdapter.ContractVH> {
 
-    private final List<Contract> items;
-    private final Map<String, String> roomNames;
-    private final Consumer<Contract> onItemClick;
+    public interface OnContractClickListener {
+        void onContractClick(Contract contract);
+    }
 
-    public ContractAdapter(List<Contract> items,
-                           Map<String, String> roomNames,
-                           Consumer<Contract> onItemClick) {
-        this.items = items;
-        this.roomNames = roomNames;
-        this.onItemClick = onItemClick;
+    private final List<Contract> contracts;
+    private final Map<String, String> roomNamesMap;
+    private final OnContractClickListener listener;
+
+    public ContractAdapter(List<Contract> contracts,
+                           Map<String, String> roomNamesMap,
+                           OnContractClickListener listener) {
+        this.contracts = contracts;
+        this.roomNamesMap = roomNamesMap;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
-    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ContractVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_contract, parent, false);
-        return new VH(v);
+                .inflate(R.layout.item_contract_grid, parent, false);
+        return new ContractVH(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VH holder, int pos) {
-        Contract c = items.get(pos);
-        // Phòng X
-        holder.tvRoom.setText(
-                roomNames.getOrDefault(c.getRoomId(), "Phòng ?"));
-        // Trạng thái
-        holder.tvStatus.setText(
-                c.isPaid() ? "Đã thanh toán" : "Chưa thanh toán");
-        // Click chuyển detail
-        holder.itemView.setOnClickListener(v ->
-                onItemClick.accept(c));
+    public void onBindViewHolder(@NonNull ContractVH holder, int position) {
+        Contract c = contracts.get(position);
+
+        // Lấy tên phòng từ map (vd: "Phòng 101")
+        String roomLabel = roomNamesMap.getOrDefault(c.getRoomId(), "Phòng ?");
+        holder.tvRoomLabel.setText(roomLabel);
+
+        // Nếu muốn đổi icon theo trạng thái có thể set ở đây
+        // holder.ivContractIcon.setImageResource(R.drawable.ic_contract);
+
+        holder.itemView.setOnClickListener(v -> listener.onContractClick(c));
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return contracts.size();
     }
 
-    static class VH extends RecyclerView.ViewHolder {
-        TextView tvRoom, tvStatus;
-        VH(@NonNull View itemView) {
+    static class ContractVH extends RecyclerView.ViewHolder {
+        ImageView ivContractIcon;
+        TextView tvRoomLabel;
+
+        public ContractVH(@NonNull View itemView) {
             super(itemView);
-            tvRoom   = itemView.findViewById(R.id.tvContractRoom);
-            tvStatus = itemView.findViewById(R.id.tvContractStatus);
+            ivContractIcon = itemView.findViewById(R.id.ivContractIcon);
+            tvRoomLabel    = itemView.findViewById(R.id.tvRoomLabel);
         }
     }
 }

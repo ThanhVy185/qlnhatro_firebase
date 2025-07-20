@@ -195,7 +195,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:gravity="center"
-                    android:text="Quản Lý\nThông Báo"
+                    android:text="Thống kê \n báo cáo"
                     android:textColor="#4A5568"
                     android:textSize="14sp" />
             </LinearLayout>

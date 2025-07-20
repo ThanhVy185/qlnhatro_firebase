@@ -2,92 +2,92 @@ package com.huflit.qlnhatro;
 
 import com.google.firebase.firestore.PropertyName;
 
+
+
 public class Contract {
     private String id;
     private String contractCode;
-    private String roomId;
+    private String roomNumber;
     private String tenantName;
     private String identityNumber;
-    private long endDate;
     private String imageUrl;
-    private String invoiceId;
-    private boolean isPaid;
+    private String roomId;
+    private long createDate;
+    private long endDate;
 
-    // Mandatory empty constructor for Firestore deserialization
-    public Contract() {}
+    public Contract() {
+        // Constructor rỗng cần thiết cho Firebase
+    }
 
-    // --- id ---
+    public Contract(String id, String contractCode, String roomNumber, String tenantName, String identityNumber, String imageUrl) {
+        this.id = id;
+        this.contractCode = contractCode;
+        this.roomNumber = roomNumber;
+        this.tenantName = tenantName;
+        this.identityNumber = identityNumber;
+        this.imageUrl = imageUrl;
+        this.roomId = roomId;
+        this.createDate =createDate;
+        this.endDate=endDate;
+    }
+
+    // Getters
     public String getId() {
         return id;
     }
+
+    public String getContractCode() {
+        return contractCode;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public String getRoomId() {
+        return roomId;}
+
+    // Setters
     public void setId(String id) {
         this.id = id;
     }
 
-    // --- contractCode ---
-    public String getContractCode() {
-        return contractCode;
-    }
     public void setContractCode(String contractCode) {
         this.contractCode = contractCode;
     }
 
-    // --- roomId ---
-    public String getRoomId() {
-        return roomId;
-    }
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
-    // --- tenantName ---
-    public String getTenantName() {
-        return tenantName;
-    }
     public void setTenantName(String tenantName) {
         this.tenantName = tenantName;
     }
 
-    // --- identityNumber ---
-    public String getIdentityNumber() {
-        return identityNumber;
-    }
     public void setIdentityNumber(String identityNumber) {
         this.identityNumber = identityNumber;
     }
 
-    // --- endDate ---
-    public long getEndDate() {
-        return endDate;
-    }
-    public void setEndDate(long endDate) {
-        this.endDate = endDate;
-    }
-
-    // --- imageUrl ---
-    public String getImageUrl() {
-        return imageUrl;
-    }
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+    public long getCreateDate() { return createDate; }
+    public void setCreateDate(long createDate) { this.createDate = createDate; }
 
-    // --- invoiceId ---
-    public String getInvoiceId() {
-        return invoiceId;
-    }
-    public void setInvoiceId(String invoiceId) {
-        this.invoiceId = invoiceId;
-    }
-
-    // --- isPaid ---
-    @PropertyName("isPaid")
-    public boolean isPaid() {
-        return isPaid;
-    }
-
-    @PropertyName("isPaid")
-    public void setIsPaid(boolean isPaid) {
-        this.isPaid = isPaid;
-    }
+    public long getEndDate() { return endDate; }
+    public void setEndDate(long endDate) { this.endDate = endDate; }
 }

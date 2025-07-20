@@ -2,11 +2,11 @@ package com.huflit.qlnhatro;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,20 +20,26 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import Data.Invoice;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import com.huflit.qlnhatro.Contract;
 import Data.Room;
 
 public class ContractDetailActivity extends AppCompatActivity {
     private TextView tvContractHeader, tvContractCode, tvTenantName, tvIdNumber;
-    private TextView tvElecLabel, tvElecValue, tvWaterLabel, tvWaterValue;
-    private TextView tvServiceLabel, tvServiceValue, tvParkingLabel, tvParkingValue;
-    private TextView tvTotalFee;
+    private TextView tvCreateDate, tvEndDate;
     private ImageView ivContractImage;
-    private MaterialButton btnMarkPaid, btnDelete;
+    private MaterialButton btnDelete;
 
     private FirebaseFirestore db;
     private String contractId;
-    private String imageUrl;
+    private Uri imageUri;
+
+    private static final SimpleDateFormat DATE_FORMAT =
+            new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,30 +56,14 @@ public class ContractDetailActivity extends AppCompatActivity {
                 }
         );
 
-        // Bind views
         tvContractHeader = findViewById(R.id.tvContractHeader);
         tvContractCode   = findViewById(R.id.tvContractCode);
         tvTenantName     = findViewById(R.id.tvTenantName);
         tvIdNumber       = findViewById(R.id.tvIdNumber);
-
-        LinearLayout elecLayout    = findViewById(R.id.layoutElec);
-        LinearLayout waterLayout   = findViewById(R.id.layoutWater);
-        LinearLayout serviceLayout = findViewById(R.id.layoutService);
-        LinearLayout parkingLayout = findViewById(R.id.layoutParking);
-
-        tvElecLabel    = elecLayout.findViewById(R.id.tvFeeLabel);
-        tvElecValue    = elecLayout.findViewById(R.id.tvFeeValue);
-        tvWaterLabel   = waterLayout.findViewById(R.id.tvFeeLabel);
-        tvWaterValue   = waterLayout.findViewById(R.id.tvFeeValue);
-        tvServiceLabel = serviceLayout.findViewById(R.id.tvFeeLabel);
-        tvServiceValue = serviceLayout.findViewById(R.id.tvFeeValue);
-        tvParkingLabel = parkingLayout.findViewById(R.id.tvFeeLabel);
-        tvParkingValue = parkingLayout.findViewById(R.id.tvFeeValue);
-
-        tvTotalFee      = findViewById(R.id.tvTotalFee);
-        ivContractImage = findViewById(R.id.ivContractImage);
-        btnMarkPaid     = findViewById(R.id.btnMarkPaid);
-        btnDelete       = findViewById(R.id.btnDelete);
+        tvCreateDate     = findViewById(R.id.tvCreateDate);
+        tvEndDate        = findViewById(R.id.tvEndDate);
+        ivContractImage  = findViewById(R.id.ivContractImage);
+        btnDelete        = findViewById(R.id.btnDelete);
 
         db = FirebaseFirestore.getInstance();
         contractId = getIntent().getStringExtra("contractId");
@@ -84,8 +74,6 @@ public class ContractDetailActivity extends AppCompatActivity {
         }
 
         loadContract();
-
-        btnMarkPaid.setOnClickListener(v -> markAsPaid());
         btnDelete.setOnClickListener(v -> confirmDeletion());
     }
 
@@ -95,7 +83,13 @@ public class ContractDetailActivity extends AppCompatActivity {
                     Contract c = doc.toObject(Contract.class);
                     if (c == null) return;
 
-                    // Header
+                    // 1) Lấy và hiển thị ngày
+                    tvCreateDate.setText(
+                            DATE_FORMAT.format(new Date(c.getCreateDate())));
+                    tvEndDate.setText(
+                            DATE_FORMAT.format(new Date(c.getEndDate())));
+
+                    // 2) Header phòng
                     db.collection("rooms").document(c.getRoomId()).get()
                             .addOnSuccessListener(rdoc -> {
                                 Room r = rdoc.toObject(Room.class);
@@ -103,93 +97,75 @@ public class ContractDetailActivity extends AppCompatActivity {
                                     tvContractHeader.setText("HỢP ĐỒNG PHÒNG " + r.getNumber());
                             });
 
+                    // 3) Thông tin text
                     tvContractCode.setText(c.getContractCode());
                     tvTenantName.setText(c.getTenantName());
                     tvIdNumber.setText(c.getIdentityNumber());
 
-                    // Image
-                    imageUrl = c.getImageUrl();
-                    if (imageUrl != null && !imageUrl.isEmpty()) {
-                        Glide.with(this)
-                                .load(Uri.parse(imageUrl))
-                                .centerCrop()
-                                .into(ivContractImage);
-                        ivContractImage.setOnClickListener(v -> showFullScreenImage());
+                    // 4) Ảnh hợp đồng
+                    String uriString = c.getImageUrl();
+                    if (uriString != null && !uriString.isEmpty()) {
+                        imageUri = Uri.parse(uriString);
+                        if ("content".equals(imageUri.getScheme())) {
+                            try (InputStream is = getContentResolver().openInputStream(imageUri)) {
+                                ivContractImage.setImageBitmap(BitmapFactory.decodeStream(is));
+                            } catch (Exception e) {
+                                ivContractImage.setImageResource(R.drawable.img_home);
+                            }
+                        } else {
+                            Glide.with(this)
+                                    .load(imageUri)
+                                    .centerCrop()
+                                    .into(ivContractImage);
+                        }
+                        ivContractImage.setOnClickListener(v -> showFullScreenImage(imageUri));
                     }
-
-                    // Invoice
-                    if (c.getInvoiceId() != null) {
-                        db.collection("invoices").document(c.getInvoiceId()).get()
-                                .addOnSuccessListener(inv -> {
-                                    Invoice i = inv.toObject(Invoice.class);
-                                    if (i != null) {
-                                        tvElecLabel.setText("Tiền điện");
-                                        tvElecValue.setText(String.format("%,d₫", i.getElectricityFee()));
-                                        tvWaterLabel.setText("Tiền nước");
-                                        tvWaterValue.setText(String.format("%,d₫", i.getWaterFee()));
-                                        tvServiceLabel.setText("Phí dịch vụ");
-                                        tvServiceValue.setText(String.format("%,d₫", i.getServiceFee()));
-                                        tvParkingLabel.setText("Phí gửi xe");
-                                        tvParkingValue.setText(String.format("%,d₫", i.getParkingFee()));
-                                        tvTotalFee.setText(String.format("%,d₫", i.getTotalFee()));
-                                    }
-                                });
-                    }
-
-                    // Disable if already paid
-                    if (c.isPaid()) btnMarkPaid.setEnabled(false);
-
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi tải chi tiết: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Lỗi tải chi tiết: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show()
                 );
     }
 
-    private void showFullScreenImage() {
-        if (imageUrl == null) return;
-        Dialog d = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+    private void showFullScreenImage(Uri uri) {
+        if (uri == null) return;
+        Dialog d = new Dialog(this,
+                android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         ImageView iv = new ImageView(this);
         iv.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        Glide.with(this).load(Uri.parse(imageUrl)).into(iv);
+
+        if ("content".equals(uri.getScheme())) {
+            try (InputStream is = getContentResolver().openInputStream(uri)) {
+                iv.setImageBitmap(BitmapFactory.decodeStream(is));
+            } catch (Exception e) {
+                iv.setImageResource(R.drawable.img_home);
+            }
+        } else {
+            Glide.with(this).load(uri).into(iv);
+        }
+
+        iv.setOnClickListener(x -> d.dismiss());
         d.setContentView(iv);
         d.show();
-    }
-
-    private void markAsPaid() {
-        db.collection("contracts").document(contractId)
-                .update("isPaid", true)
-                .addOnSuccessListener(a -> {
-                    setResult(RESULT_OK);
-                    Toast.makeText(this, "Đã đánh dấu hợp đồng đã toán", Toast.LENGTH_SHORT).show();
-                    finish();  // <- Đóng detail để list tự reload
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi đánh dấu: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
     }
 
     private void confirmDeletion() {
         new AlertDialog.Builder(this)
                 .setTitle("Xóa hợp đồng")
                 .setMessage("Bạn có chắc muốn xóa hợp đồng này không?")
-                .setPositiveButton("Xóa", (d,w) -> deleteContract())
+                .setPositiveButton("Xóa", (d,w) -> {
+                    db.collection("contracts").document(contractId)
+                            .delete()
+                            .addOnSuccessListener(a -> {
+                                Toast.makeText(this, "Đã xóa hợp đồng",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
+                })
                 .setNegativeButton("Hủy", null)
                 .show();
-    }
-
-    private void deleteContract() {
-        db.collection("contracts").document(contractId)
-                .delete()
-                .addOnSuccessListener(a -> {
-                    setResult(RESULT_OK);
-                    Toast.makeText(this, "Đã xóa hợp đồng", Toast.LENGTH_SHORT).show();
-                    finish();  // <- Đóng detail để list tự reload
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
     }
 }
