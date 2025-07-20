@@ -164,9 +164,10 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card 4: Quản lý Thông báo -->
+
+        <!-- Card 4: Báo cáo thống kê -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnQLThongBao"
+            android:id="@+id/btnReport"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -187,7 +188,7 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@android:drawable/ic_dialog_info"
+                    android:src="@android:drawable/ic_menu_view"
                     app:tint="#00C853" />
 
                 <TextView
@@ -195,12 +196,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:gravity="center"
-                    android:text="Thống kê \n báo cáo"
+                    android:text="Báo Cáo\nThống Kê"
                     android:textColor="#4A5568"
                     android:textSize="14sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
     </GridLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

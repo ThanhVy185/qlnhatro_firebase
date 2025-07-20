@@ -1,47 +1,51 @@
 package com.huflit.qlnhatro;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RadioGroup; // << Thêm import
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import Adapter.HoaDonAdapter;
 import Data.HoaDon;
 
 public class HoaDonActivity extends AppCompatActivity {
 
-    ListView lvHoaDon;
-    Button btnTaoMoi;
-    Button btnDelete;
-    RadioGroup rgFilterStatus; // << Khai báo RadioGroup
-    HoaDonAdapter hoaDonAdapter;
-    ArrayList<HoaDon> listHD;
+    // Khai báo các View
+    private ListView lvHoaDon;
+    private Button btnTaoMoi, btnDelete;
+    private RadioGroup rgFilterStatus;
+    private Spinner spnFilterMonth, spnFilterYear; // Spinner mới
+
+    private HoaDonAdapter hoaDonAdapter;
+    private ArrayList<HoaDon> fullHoaDonList; // Danh sách chứa TẤT CẢ hóa đơn từ Firestore
+    private ArrayList<HoaDon> filteredHoaDonList; // Danh sách hiển thị sau khi lọc
 
     private FirebaseFirestore db;
-    private ListenerRegistration firestoreListener;
-    private static boolean isSeeding = false;
     private int selectedPosition = -1;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,73 +53,163 @@ public class HoaDonActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        // <<< THAY ĐỔI: Gọi hàm để thêm dữ liệu mẫu >>>
+        addSampleData();
 
-        // --- Ánh xạ các view ---
-        btnTaoMoi = findViewById(R.id.btnTaoMoi);
-        lvHoaDon = findViewById(R.id.listHoaDon);
-        btnDelete = findViewById(R.id.btnDelete);
-        rgFilterStatus = findViewById(R.id.rgFilterStatus); // << Ánh xạ RadioGroup
+        // Ánh xạ các View
+        bindViews();
 
-        listHD = new ArrayList<>();
-        hoaDonAdapter = new HoaDonAdapter(this, listHD);
+        // Khởi tạo danh sách
+        fullHoaDonList = new ArrayList<>();
+        filteredHoaDonList = new ArrayList<>();
+        hoaDonAdapter = new HoaDonAdapter(this, filteredHoaDonList);
         lvHoaDon.setAdapter(hoaDonAdapter);
 
+        // Cấu hình các bộ lọc
+        setupFilters();
+
+        // Đăng ký các sự kiện
         setupEventListeners();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        seedDataIfEmpty();
-        // Tải toàn bộ hóa đơn khi bắt đầu
-        loadInvoices(null);
+        // Tải dữ liệu từ Firestore mỗi khi Activity được hiển thị
+        loadAllInvoicesFromFirestore();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (firestoreListener != null) {
-            firestoreListener.remove();
-        }
+    private void bindViews() {
+        lvHoaDon = findViewById(R.id.listHoaDon);
+        btnTaoMoi = findViewById(R.id.btnTaoMoi);
+        btnDelete = findViewById(R.id.btnDelete);
+        rgFilterStatus = findViewById(R.id.rgFilterStatus);
+        spnFilterMonth = findViewById(R.id.spnFilterMonth);
+        spnFilterYear = findViewById(R.id.spnFilterYear);
     }
 
-    // << HÀM TẢI DỮ LIỆU ĐƯỢC THAY ĐỔI ĐỂ CÓ THỂ LỌC >>
-    private void loadInvoices(String statusFilter) {
-        // Hủy listener cũ trước khi tạo listener mới để tránh rò rỉ bộ nhớ
-        if (firestoreListener != null) {
-            firestoreListener.remove();
+    /**
+     * Cấu hình giá trị ban đầu và sự kiện cho các Spinner lọc.
+     */
+    private void setupFilters() {
+        // --- Cấu hình Spinner Tháng ---
+        List<String> months = new ArrayList<>();
+        months.add("Tất cả tháng"); // Lựa chọn để không lọc theo tháng
+        for (int m = 1; m <= 12; m++) {
+            months.add("Tháng " + m);
         }
+        spnFilterMonth.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, months));
 
-        // Tạo câu truy vấn cơ bản
-        Query query = db.collection("HoaDon");
-
-        // Nếu có tham số lọc, thêm điều kiện whereEqualTo
-        if (statusFilter != null && !statusFilter.isEmpty()) {
-            query = query.whereEqualTo("trangThai", statusFilter);
+        // --- Cấu hình Spinner Năm ---
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        List<String> years = new ArrayList<>();
+        years.add("Tất cả năm"); // Lựa chọn để không lọc theo năm
+        for (int y = currentYear - 5; y <= currentYear; y++) {
+            years.add(String.valueOf(y));
         }
+        spnFilterYear.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years));
 
-        // Lắng nghe sự thay đổi trên câu truy vấn đã tạo
-        firestoreListener = query.addSnapshotListener((snapshots, e) -> {
-            if (e != null) {
-                Log.w("Firestore", "Listen failed.", e);
-                return;
+        // --- Tạo listener chung cho tất cả các bộ lọc ---
+        AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                applyFilters();
             }
-            listHD.clear();
-            if (snapshots != null) {
-                for (QueryDocumentSnapshot doc : snapshots) {
-                    HoaDon hoaDon = doc.toObject(HoaDon.class);
-                    hoaDon.setId(doc.getId()); // Gán ID cho đối tượng
-                    listHD.add(hoaDon);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        };
+
+        rgFilterStatus.setOnCheckedChangeListener((group, checkedId) -> applyFilters());
+        spnFilterMonth.setOnItemSelectedListener(spinnerListener);
+        spnFilterYear.setOnItemSelectedListener(spinnerListener);
+    }
+
+    /**
+     * Tải toàn bộ hóa đơn từ Firestore và lưu vào danh sách gốc (fullHoaDonList).
+     */
+    private void loadAllInvoicesFromFirestore() {
+        db.collection("HoaDon").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    fullHoaDonList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        HoaDon hoaDon = doc.toObject(HoaDon.class);
+                        hoaDon.setId(doc.getId());
+                        fullHoaDonList.add(hoaDon);
+                    }
+                    // Sau khi tải xong, áp dụng bộ lọc để hiển thị
+                    applyFilters();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * Áp dụng tất cả các bộ lọc hiện tại vào danh sách gốc và cập nhật ListView.
+     */
+    private void applyFilters() {
+        // Lấy giá trị từ các bộ lọc
+        int selectedStatusId = rgFilterStatus.getCheckedRadioButtonId();
+        int selectedMonthPos = spnFilterMonth.getSelectedItemPosition();
+        int selectedYearPos = spnFilterYear.getSelectedItemPosition();
+
+        String statusFilter = null;
+        if (selectedStatusId == R.id.rbPaid) {
+            statusFilter = "Đã thanh toán";
+        } else if (selectedStatusId == R.id.rbUnpaid) {
+            statusFilter = "Chưa thanh toán";
+        }
+
+        int monthFilter = selectedMonthPos > 0 ? selectedMonthPos : -1;
+        int yearFilter = -1;
+        if (selectedYearPos > 0) {
+            yearFilter = Integer.parseInt((String) spnFilterYear.getItemAtPosition(selectedYearPos));
+        }
+
+        // Bắt đầu lọc
+        ArrayList<HoaDon> tempFilteredList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        for (HoaDon hd : fullHoaDonList) {
+            // 1. Kiểm tra trạng thái
+            boolean statusMatch = (statusFilter == null) || hd.getTrangThai().equalsIgnoreCase(statusFilter);
+
+            // Nếu trạng thái không khớp, bỏ qua và xét hóa đơn tiếp theo
+            if (!statusMatch) {
+                continue;
+            }
+
+            // 2. Kiểm tra ngày tháng năm
+            boolean dateMatch = (monthFilter == -1 && yearFilter == -1); // Mặc định khớp nếu không có bộ lọc ngày
+            if (!dateMatch) { // Chỉ kiểm tra nếu có chọn bộ lọc tháng hoặc năm
+                try {
+                    Date date = sdf.parse(hd.getNgayLap());
+                    if (date != null) {
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(date);
+                        // Điều kiện khớp khi: bộ lọc là "Tất cả" HOẶC giá trị khớp
+                        boolean monthMatches = (monthFilter == -1) || (cal.get(Calendar.MONTH) + 1 == monthFilter);
+                        boolean yearMatches = (yearFilter == -1) || (cal.get(Calendar.YEAR) == yearFilter);
+                        if (monthMatches && yearMatches) {
+                            dateMatch = true;
+                        }
+                    }
+                } catch (ParseException e) {
+                    dateMatch = false; // Nếu ngày không hợp lệ, coi như không khớp
                 }
             }
-            hoaDonAdapter.notifyDataSetChanged();
-            selectedPosition = -1; // Reset lựa chọn khi danh sách thay đổi
-        });
+
+            // Nếu cả hai điều kiện đều khớp, thêm vào danh sách hiển thị
+            if (dateMatch) {
+                tempFilteredList.add(hd);
+            }
+        }
+
+        // Cập nhật danh sách hiển thị và ListView
+        filteredHoaDonList.clear();
+        filteredHoaDonList.addAll(tempFilteredList);
+        hoaDonAdapter.notifyDataSetChanged();
+        selectedPosition = -1; // Reset lựa chọn
     }
 
     private void setupEventListeners() {
@@ -124,25 +218,14 @@ public class HoaDonActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // << THÊM SỰ KIỆN CHO BỘ LỌC >>
-        rgFilterStatus.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.rbAll) {
-                loadInvoices(null); // Tải tất cả
-            } else if (checkedId == R.id.rbUnpaid) {
-                loadInvoices("Chưa thanh toán"); // Lọc theo "Chưa thanh toán"
-            } else if (checkedId == R.id.rbPaid) {
-                loadInvoices("Đã thanh toán"); // Lọc theo "Đã thanh toán"
-            }
-        });
-
         lvHoaDon.setOnItemClickListener((adapterView, itemView, position, id) -> {
+            selectedPosition = position;
             hoaDonAdapter.setSelectedPosition(position);
             hoaDonAdapter.notifyDataSetChanged();
-            selectedPosition = position;
         });
 
         lvHoaDon.setOnItemLongClickListener((parent, view, position, id) -> {
-            HoaDon hd = listHD.get(position);
+            HoaDon hd = filteredHoaDonList.get(position); // Lấy từ danh sách đã lọc
             Intent intent = new Intent(HoaDonActivity.this, Hoadon_chitiet.class);
             intent.putExtra("documentId", hd.getId());
             intent.putExtra("maPhong", hd.getMaPhong());
@@ -166,49 +249,59 @@ public class HoaDonActivity extends AppCompatActivity {
             }
             new AlertDialog.Builder(this)
                     .setTitle("Xác nhận xóa")
-                    .setMessage("Bạn có chắc chắn muốn xóa hóa đơn cho phòng " + listHD.get(selectedPosition).getMaPhong() + "?")
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setMessage("Bạn có chắc chắn muốn xóa hóa đơn này?")
                     .setPositiveButton("Xóa", (dialog, which) -> deleteSelectedHoaDon())
                     .setNegativeButton("Hủy", null)
                     .show();
         });
     }
 
+    /**
+     * <<< HÀM ĐƯỢC CẬP NHẬT: Thêm dữ liệu mẫu dựa trên hình ảnh vào tháng 6 >>>
+     */
+    private void addSampleData() {
+        // Dùng một mã phòng đặc biệt để kiểm tra xem dữ liệu đã được thêm chưa
+        db.collection("HoaDon").whereEqualTo("maPhong", "P-SAMPLE-TEST").limit(1).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // Nếu chưa có, tiến hành thêm dữ liệu mẫu
+                        WriteBatch batch = db.batch();
+                        ArrayList<HoaDon> sampleList = new ArrayList<>();
+
+                        // Dữ liệu từ hình ảnh, nhưng đổi ngày sang tháng 6
+                        sampleList.add(new HoaDon("P-SAMPLE-TEST", "Nhã Trần", "0901112233", 2000000, 150000, 75000, "21/06/2025", "Đã thanh toán", 45.0, 5.0));
+                        sampleList.add(new HoaDon("10", "Sang", "0902223344", 2000000, 220000, 120000, "21/06/2025", "Chưa thanh toán", 65.0, 8.0));
+                        sampleList.add(new HoaDon("15", "Vy", "0903334455", 2000000, 190000, 90000, "21/06/2025", "Đã thanh toán", 55.0, 6.0));
+                        sampleList.add(new HoaDon("19", "Trang", "0904445566", 2000000, 250000, 130000, "21/06/2025", "Chưa thanh toán", 70.0, 9.0));
+
+                        for (HoaDon hoaDon : sampleList) {
+                            DocumentReference docRef = db.collection("HoaDon").document();
+                            batch.set(docRef, hoaDon);
+                        }
+                        batch.commit().addOnSuccessListener(aVoid -> {
+                            Toast.makeText(HoaDonActivity.this, "Đã thêm dữ liệu mẫu.", Toast.LENGTH_SHORT).show();
+                            // Tải lại dữ liệu sau khi thêm thành công
+                            loadAllInvoicesFromFirestore();
+                        }).addOnFailureListener(e -> {
+                            Log.e("HoaDonActivity", "Lỗi khi thêm dữ liệu mẫu: ", e);
+                        });
+                    }
+                    // Nếu đã có dữ liệu thì không làm gì cả
+                });
+    }
+
+
     private void deleteSelectedHoaDon() {
-        if (selectedPosition < 0 || selectedPosition >= listHD.size()) return;
-        String documentId = listHD.get(selectedPosition).getId();
+        if (selectedPosition < 0 || selectedPosition >= filteredHoaDonList.size()) return;
+        String documentId = filteredHoaDonList.get(selectedPosition).getId();
         db.collection("HoaDon").document(documentId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Đã xóa hóa đơn thành công", Toast.LENGTH_SHORT).show();
-                    // selectedPosition đã được reset trong listener
+                    loadAllInvoicesFromFirestore(); // Tải lại toàn bộ dữ liệu
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Lỗi khi xóa hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    // --- Các hàm khởi tạo dữ liệu mẫu (giữ nguyên) ---
-    private void seedDataIfEmpty() {
-        if (isSeeding) return;
-        db.collection("HoaDon").limit(1).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult().isEmpty()) {
-                isSeeding = true;
-                addSampleDataToFirestore();
-            }
-        });
-    }
-
-    private void addSampleDataToFirestore() {
-        WriteBatch batch = db.batch();
-        ArrayList<HoaDon> sampleList = new ArrayList<>();
-        sampleList.add(new HoaDon("P101", "Nguyễn Văn An", "0911111111", 2500000, 150000, 80000, "15/07/2025", "Chưa thanh toán", 42.8, 5.3));
-        sampleList.add(new HoaDon("P102", "Trần Thị Bình", "0922222222", 3000000, 200000, 100000, "14/07/2025", "Đã thanh toán", 57.1, 6.6));
-        sampleList.add(new HoaDon("P103", "Lê Văn Cường", "0933333333", 2700000, 175000, 90000, "13/07/2025", "Chưa thanh toán", 50.0, 6.0));
-        for (HoaDon hoaDon : sampleList) {
-            DocumentReference docRef = db.collection("HoaDon").document();
-            batch.set(docRef, hoaDon);
-        }
-        batch.commit().addOnSuccessListener(aVoid -> isSeeding = false).addOnFailureListener(e -> isSeeding = false);
     }
 }

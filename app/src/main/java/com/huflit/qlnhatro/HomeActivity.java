@@ -2,15 +2,15 @@ package com.huflit.qlnhatro;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.card.MaterialCardView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
+
 public class HomeActivity extends AppCompatActivity {
 
-    MaterialCardView btnQLPhong, btnQLHopDong, btnQLHoaDon, btnQLThongBao;
+    MaterialCardView btnQLPhong, btnQLHopDong, btnQLHoaDon, btnReport;
     TextView btnExit;
 
     @Override
@@ -18,11 +18,11 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        btnQLPhong = findViewById(R.id.btnQLPhong);
-        btnQLHopDong = findViewById(R.id.btnQLHopDong);
-        btnQLHoaDon = findViewById(R.id.btnQLHoaDon);
-        btnQLThongBao = findViewById(R.id.btnQLThongBao);
-        btnExit = findViewById(R.id.btnExit);
+        btnQLPhong    = findViewById(R.id.btnQLPhong);
+        btnQLHopDong  = findViewById(R.id.btnQLHopDong);
+        btnQLHoaDon   = findViewById(R.id.btnQLHoaDon);
+        btnReport     = findViewById(R.id.btnReport);        // <- ID mới
+        btnExit       = findViewById(R.id.btnExit);
 
         btnQLPhong.setOnClickListener(v ->
                 startActivity(new Intent(this, RoomManagementActivity.class)));
@@ -33,11 +33,9 @@ public class HomeActivity extends AppCompatActivity {
         btnQLHoaDon.setOnClickListener(v ->
                 startActivity(new Intent(this, HoaDonActivity.class)));
 
-        // Nếu chưa dùng thì comment lại
-        /*
-        btnQLThongBao.setOnClickListener(v ->
-                startActivity(new Intent(this, QuanLyThongBaoActivity.class)));
-        */
+        // Khi nhấn vào “Báo Cáo Thống Kê” mở ReportActivity
+        btnReport.setOnClickListener(v ->
+                startActivity(new Intent(this, ReportActivity.class)));
 
         btnExit.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, DangnhapActivity.class);

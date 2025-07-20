@@ -9,6 +9,7 @@
     android:orientation="vertical"
     tools:context=".HoaDonActivity">
 
+    <!-- TIÊU ĐỀ -->
     <TextView
         android:id="@+id/tvHoaDonTitle"
         android:layout_width="match_parent"
@@ -21,13 +22,21 @@
         android:textSize="22sp"
         android:textStyle="bold" />
 
+    <!-- BỘ LỌC TRẠNG THÁI -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Lọc theo trạng thái"
+        android:textSize="14sp" />
+
     <RadioGroup
         android:id="@+id/rgFilterStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingBottom="16dp">
+        android:paddingBottom="8dp">
 
         <RadioButton
             android:id="@+id/rbAll"
@@ -42,15 +51,48 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:text="Chưa thanh toán" />
+            android:text="Chưa TT" />
 
         <RadioButton
             android:id="@+id/rbPaid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đã thanh toán" />
-
+            android:text="Đã TT" />
     </RadioGroup>
+
+    <!-- BỘ LỌC THÁNG/NĂM (MỚI THÊM) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Lọc theo thời gian"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
+
+        <Spinner
+            android:id="@+id/spnFilterMonth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/spnFilterYear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
+    <!-- DANH SÁCH HÓA ĐƠN -->
     <ListView
         android:id="@+id/listHoaDon"
         android:layout_width="match_parent"
@@ -61,9 +103,10 @@
         android:dividerHeight="8dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        android:paddingBottom="16dp"/>
+        android:paddingBottom="16dp" />
 
 
+    <!-- CÁC NÚT CHỨC NĂNG -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

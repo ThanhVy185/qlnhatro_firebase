@@ -17,6 +17,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // <<< SỬA LẠI DÒNG NÀY CHO ĐÚNG CÚ PHÁP KOTLIN >>>
+        maven { url = uri("https://www.jitpack.io") }
     }
 }
 
