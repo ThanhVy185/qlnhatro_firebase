@@ -110,7 +110,7 @@ public class ContractDetailActivity extends AppCompatActivity {
                             try (InputStream is = getContentResolver().openInputStream(imageUri)) {
                                 ivContractImage.setImageBitmap(BitmapFactory.decodeStream(is));
                             } catch (Exception e) {
-                                ivContractImage.setImageResource(R.drawable.img_home);
+                                ivContractImage.setImageResource(R.drawable.icon_contract);
                             }
                         } else {
                             Glide.with(this)
@@ -141,7 +141,7 @@ public class ContractDetailActivity extends AppCompatActivity {
             try (InputStream is = getContentResolver().openInputStream(uri)) {
                 iv.setImageBitmap(BitmapFactory.decodeStream(is));
             } catch (Exception e) {
-                iv.setImageResource(R.drawable.img_home);
+                iv.setImageResource(R.drawable.icon_contract);
             }
         } else {
             Glide.with(this).load(uri).into(iv);
