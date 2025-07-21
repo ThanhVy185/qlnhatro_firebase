@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -46,6 +47,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
     public void onBindViewHolder(@NonNull RoomViewHolder holder, int position) {
         Room room = roomList.get(position);
         holder.tvRoomNumber.setText(room.getNumber());
+        boolean available = !room.isHasContract();
 
         // Đổi màu viền nếu phòng đã có hợp đồng
         int strokeColor = room.isHasContract()
@@ -54,6 +56,18 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
         holder.cardRoom.setStrokeColor(strokeColor);
 
         // Click / Long-click
+        holder.itemView.setOnClickListener(v -> listener.onClick(room));
+        holder.itemView.setOnLongClickListener(v -> {
+            listener.onLongClick(room, position);
+            return true;
+        });
+
+        // 2) **đổi icon**
+        int iconRes = available
+                ? R.drawable.opendoor      // phòng trống
+                : R.drawable.close_doors;  // phòng đã có hợp đồng
+        holder.ivRoomIcon.setImageResource(iconRes);
+
         holder.itemView.setOnClickListener(v -> listener.onClick(room));
         holder.itemView.setOnLongClickListener(v -> {
             listener.onLongClick(room, position);
@@ -76,11 +90,14 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomViewHolder
     static class RoomViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardRoom;
         TextView tvRoomNumber;
+        ImageView ivRoomIcon;
 
         public RoomViewHolder(@NonNull View itemView) {
             super(itemView);
             cardRoom = itemView.findViewById(R.id.cardRoom);
             tvRoomNumber = itemView.findViewById(R.id.tvRoomNumber);
+            ivRoomIcon     = itemView.findViewById(R.id.ivRoomIcon);  // <-- tìm view
+
         }
     }
 }
