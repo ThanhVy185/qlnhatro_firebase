@@ -269,10 +269,10 @@ public class HoaDonActivity extends AppCompatActivity {
                         ArrayList<HoaDon> sampleList = new ArrayList<>();
 
                         // Dữ liệu từ hình ảnh, nhưng đổi ngày sang tháng 6
-                        sampleList.add(new HoaDon("P-SAMPLE-TEST", "Nhã Trần", "0901112233", 2000000, 150000, 75000, "21/06/2025", "Đã thanh toán", 45.0, 5.0));
-                        sampleList.add(new HoaDon("10", "Sang", "0902223344", 2000000, 220000, 120000, "21/06/2025", "Chưa thanh toán", 65.0, 8.0));
-                        sampleList.add(new HoaDon("15", "Vy", "0903334455", 2000000, 190000, 90000, "21/06/2025", "Đã thanh toán", 55.0, 6.0));
-                        sampleList.add(new HoaDon("19", "Trang", "0904445566", 2000000, 250000, 130000, "21/06/2025", "Chưa thanh toán", 70.0, 9.0));
+
+                        sampleList.add(new HoaDon("10", "Sang", "0902223344", 2000000, 220000, 120000, "21/05/2025", "Chưa thanh toán", 65.0, 8.0));
+                        sampleList.add(new HoaDon("15", "Vy", "0903334455", 2000000, 190000, 90000, "25/05/2025", "Đã thanh toán", 55.0, 6.0));
+                        sampleList.add(new HoaDon("19", "Trang", "0904445566", 2000000, 250000, 130000, "09/05/2025", "Chưa thanh toán", 70.0, 9.0));
 
                         for (HoaDon hoaDon : sampleList) {
                             DocumentReference docRef = db.collection("HoaDon").document();

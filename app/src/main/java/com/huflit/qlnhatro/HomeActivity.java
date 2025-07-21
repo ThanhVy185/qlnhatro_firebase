@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 public class HomeActivity extends AppCompatActivity {
 
-    MaterialCardView btnQLPhong, btnQLHopDong, btnQLHoaDon, btnReport;
+    MaterialCardView btnQLPhong, btnQLHopDong, btnQLHoaDon, btnReport,btnDienNuoc;
     TextView btnExit;
 
     @Override
@@ -23,6 +23,7 @@ public class HomeActivity extends AppCompatActivity {
         btnQLHoaDon   = findViewById(R.id.btnQLHoaDon);
         btnReport     = findViewById(R.id.btnReport);        // <- ID mới
         btnExit       = findViewById(R.id.btnExit);
+        btnDienNuoc   =findViewById(R.id.btnDienNuoc);
 
         btnQLPhong.setOnClickListener(v ->
                 startActivity(new Intent(this, RoomManagementActivity.class)));
@@ -36,6 +37,8 @@ public class HomeActivity extends AppCompatActivity {
         // Khi nhấn vào “Báo Cáo Thống Kê” mở ReportActivity
         btnReport.setOnClickListener(v ->
                 startActivity(new Intent(this, ReportActivity.class)));
+        btnDienNuoc.setOnClickListener(view ->
+                startActivity(new Intent(this, DienNuocActivity.class)));
 
         btnExit.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, DangnhapActivity.class);

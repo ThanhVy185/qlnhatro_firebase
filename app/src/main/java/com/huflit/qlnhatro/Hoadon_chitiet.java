@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -119,5 +120,17 @@ public class Hoadon_chitiet extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(Hoadon_chitiet.this, "Cập nhật thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
+    }
+    private void updateStatusUI(String status) {
+        txtTrangThaiThanhToan.setText(status);
+        if ("Đã thanh toán".equalsIgnoreCase(status)) {
+            // Đổi sang màu xanh
+            txtTrangThaiThanhToan.setTextColor(ContextCompat.getColor(this, R.color.paid_text_color));
+            txtTrangThaiThanhToan.setBackgroundResource(R.drawable.bg_status_paid);
+        } else {
+            // Đổi sang màu đỏ
+            txtTrangThaiThanhToan.setTextColor(ContextCompat.getColor(this, R.color.unpaid_text_color));
+            txtTrangThaiThanhToan.setBackgroundResource(R.drawable.bg_status_unpaid);
+        }
     }
 }

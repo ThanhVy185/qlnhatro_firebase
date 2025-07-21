@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import Data.Constants;
 import Data.HoaDon;
 import Data.Room;
 
@@ -45,7 +44,11 @@ public class Tao_HoaDon extends AppCompatActivity {
     private double tienDien, tienNuoc, tienPhong;
     private double soDien, soNuoc;
     private FirebaseFirestore db;
-    private ArrayList<Room> roomList; // Thêm để xử lý spinner tốt hơn
+    private ArrayList<Room> roomList;
+
+    // THÊM BIẾN ĐỂ LƯU ĐƠN GIÁ ĐỘNG
+    private double donGiaDien = 0;
+    private double donGiaNuoc = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class Tao_HoaDon extends AppCompatActivity {
             return insets;
         });
         addControls();
+        fetchDonGia(); // THÊM BƯỚC TẢI ĐƠN GIÁ
         setupInitialData();
         setupSpinner();
         handleEvents();
@@ -77,10 +81,38 @@ public class Tao_HoaDon extends AppCompatActivity {
         tvThanhTienNuoc = findViewById(R.id.tvDien);
     }
 
+    /**
+     * THÊM HÀM MỚI: Tải đơn giá từ collection "CaiDat" trên Firebase.
+     */
+    private void fetchDonGia() {
+        db.collection("CaiDat").document("donGia").get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        // Lấy giá trị Double, nếu không có thì mặc định là 0.0
+                        Double giaDienValue = doc.getDouble("giaDien");
+                        Double giaNuocValue = doc.getDouble("giaNuoc");
+
+                        donGiaDien = (giaDienValue != null) ? giaDienValue : 0.0;
+                        donGiaNuoc = (giaNuocValue != null) ? giaNuocValue : 0.0;
+
+                        Toast.makeText(this, "Đã cập nhật đơn giá điện, nước mới nhất.", Toast.LENGTH_SHORT).show();
+                        capNhatTongTien(); // Cập nhật lại tổng tiền sau khi có đơn giá
+                    } else {
+                        // SỬA LỖI: Thay LONG_SHOW thành LENGTH_LONG
+                        Toast.makeText(this, "Lỗi: Không tìm thấy đơn giá. Vui lòng vào mục cài đặt.", Toast.LENGTH_LONG).show();
+                        btnLuu.setEnabled(false); // Không cho lưu nếu không có đơn giá
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi khi tải đơn giá.", Toast.LENGTH_SHORT).show();
+                    btnLuu.setEnabled(false);
+                });
+    }
+
+
     private void setupInitialData() {
         ngayLap = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
         tvNgayLap.setText(ngayLap);
-        edtTienPhong.setText(String.valueOf(Constants.GIA_PHONG_CO_BAN));
         btnLuu.setEnabled(false);
     }
 
@@ -140,7 +172,6 @@ public class Tao_HoaDon extends AppCompatActivity {
 
         btnHuy.setOnClickListener(v -> finish());
 
-        // <<< THAY ĐỔI: Gọi hàm kiểm tra trước khi lưu >>>
         btnLuu.setOnClickListener(v -> {
             if (!validateInput()) {
                 return;
@@ -190,8 +221,10 @@ public class Tao_HoaDon extends AppCompatActivity {
             this.soDien = soDienStr.isEmpty() ? 0 : Double.parseDouble(soDienStr);
             this.soNuoc = soNuocStr.isEmpty() ? 0 : Double.parseDouble(soNuocStr);
             this.tienPhong = tienPhongStr.isEmpty() ? 0 : Double.parseDouble(tienPhongStr);
-            this.tienDien = this.soDien * Constants.GIA_DIEN;
-            this.tienNuoc = this.soNuoc * Constants.GIA_NUOC;
+
+            // SỬA LỖI: Sử dụng đơn giá động đã tải từ Firebase
+            this.tienDien = this.soDien * donGiaDien;
+            this.tienNuoc = this.soNuoc * donGiaNuoc;
         } catch (NumberFormatException e) {
             this.tienDien = this.tienNuoc = this.tienPhong = 0;
         }
@@ -203,14 +236,9 @@ public class Tao_HoaDon extends AppCompatActivity {
         tvTongTien.setText(String.format(Locale.getDefault(), "%,.0f VNĐ", tong));
     }
 
-    /**
-     * <<< HÀM MỚI: Kiểm tra hóa đơn đã tồn tại trong tháng chưa trước khi lưu >>>
-     * @param hoaDon Hóa đơn chuẩn bị lưu
-     */
     private void checkAndSaveInvoice(final HoaDon hoaDon) {
-        btnLuu.setEnabled(false); // Vô hiệu hóa nút Lưu trong khi kiểm tra
+        btnLuu.setEnabled(false);
 
-        // Lấy tháng và năm của hóa đơn đang tạo
         Calendar calNew = Calendar.getInstance();
         try {
             Date newDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(hoaDon.getNgayLap());
@@ -225,7 +253,6 @@ public class Tao_HoaDon extends AppCompatActivity {
         final int currentMonth = calNew.get(Calendar.MONTH);
         final int currentYear = calNew.get(Calendar.YEAR);
 
-        // Truy vấn các hóa đơn đã có của phòng này
         db.collection("HoaDon")
                 .whereEqualTo("maPhong", hoaDon.getMaPhong())
                 .get()
@@ -241,7 +268,6 @@ public class Tao_HoaDon extends AppCompatActivity {
                                 int existingMonth = calExisting.get(Calendar.MONTH);
                                 int existingYear = calExisting.get(Calendar.YEAR);
 
-                                // Nếu tìm thấy hóa đơn có cùng tháng và năm, đánh dấu là đã tồn tại
                                 if (existingMonth == currentMonth && existingYear == currentYear) {
                                     invoiceExistsForMonth = true;
                                     break;
@@ -253,32 +279,25 @@ public class Tao_HoaDon extends AppCompatActivity {
                     }
 
                     if (invoiceExistsForMonth) {
-                        // Nếu đã tồn tại, hiển thị lỗi và bật lại nút Lưu
                         Toast.makeText(this, "Phòng này đã có hóa đơn trong tháng. Vui lòng xóa hóa đơn cũ để tạo mới.", Toast.LENGTH_LONG).show();
                         btnLuu.setEnabled(true);
                     } else {
-                        // Nếu chưa tồn tại, tiến hành lưu hóa đơn
                         luuHoaDonLenFirestore(hoaDon);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Nếu có lỗi khi kiểm tra, hiển thị lỗi và bật lại nút Lưu
                     Toast.makeText(this, "Lỗi khi kiểm tra hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     btnLuu.setEnabled(true);
                 });
     }
 
-    /**
-     * Lưu đối tượng hóa đơn lên Firestore.
-     * @param hoaDon Hóa đơn cần lưu
-     */
     private void luuHoaDonLenFirestore(HoaDon hoaDon) {
         db.collection("HoaDon").add(hoaDon).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Lưu hóa đơn thành công!", Toast.LENGTH_SHORT).show();
-            finish(); // Quay về màn hình trước đó
+            finish();
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Lỗi khi lưu hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            btnLuu.setEnabled(true); // Bật lại nút Lưu nếu có lỗi
+            btnLuu.setEnabled(true);
         });
     }
 }
