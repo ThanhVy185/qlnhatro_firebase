@@ -110,7 +110,7 @@ public class ContractDetailActivity extends AppCompatActivity {
                             try (InputStream is = getContentResolver().openInputStream(imageUri)) {
                                 ivContractImage.setImageBitmap(BitmapFactory.decodeStream(is));
                             } catch (Exception e) {
-                                ivContractImage.setImageResource(R.drawable.icon_contract);
+                                ivContractImage.setImageResource(R.drawable.phongngu); // mặc định là ảnh phòng ngủ
                             }
                         } else {
                             Glide.with(this)
@@ -141,7 +141,7 @@ public class ContractDetailActivity extends AppCompatActivity {
             try (InputStream is = getContentResolver().openInputStream(uri)) {
                 iv.setImageBitmap(BitmapFactory.decodeStream(is));
             } catch (Exception e) {
-                iv.setImageResource(R.drawable.icon_contract);
+                iv.setImageResource(R.drawable.phongngu);
             }
         } else {
             Glide.with(this).load(uri).into(iv);

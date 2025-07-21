@@ -15,6 +15,8 @@ public class DangnhapActivity extends AppCompatActivity {
     EditText edtEmail, edtPassword;
     Button buttonDangNhap, buttonDangKy;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

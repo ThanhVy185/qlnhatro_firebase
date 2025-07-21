@@ -2,5 +2,6 @@
     <string name="app_name">qlnhatro</string>
     <string name="desc_room_icon">Biểu tượng trạng thái phòng</string>
     <string name="desc_contract_icon">Icon hợp đồng</string>
+    <string name="desc_splash_logo">Icon Nhà trọ</string>
 
 </resources>
