@@ -1,4 +1,4 @@
-package Adapter;
+package com.huflit.qlnhatro.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

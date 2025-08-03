@@ -8,6 +8,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven ("https://jitpack.io" )
         gradlePluginPortal()
     }
 }
@@ -17,8 +18,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // <<< SỬA LẠI DÒNG NÀY CHO ĐÚNG CÚ PHÁP KOTLIN >>>
-        maven { url = uri("https://www.jitpack.io") }
+        maven ("https://jitpack.io" )
     }
 }
 

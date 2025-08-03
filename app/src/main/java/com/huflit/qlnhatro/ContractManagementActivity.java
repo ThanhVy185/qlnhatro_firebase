@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import Adapter.ContractAdapter;
+import com.huflit.qlnhatro.Adapter.ContractAdapter;
 import com.huflit.qlnhatro.Contract;
 import Data.Room;
 

@@ -83,15 +83,13 @@ public class Room {
 
     @Override
     public String toString() {
-     /*   return "Room{" +
+        return "Room{" +
                 "id='" + id + '\'' +
                 ", number='" + number + '\'' +
                 ", name='" + name + '\'' +
                 ", maxOccupancy=" + maxOccupancy +
                 ", imageUri='" + imageUri + '\'' +
                 ", interiors=" + interiors +
-                '}';*/
-        return "Phòng " + this.number;
-
+                '}';
     }
 }
