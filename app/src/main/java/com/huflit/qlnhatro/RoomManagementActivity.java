@@ -247,13 +247,28 @@ public class RoomManagementActivity extends AppCompatActivity {
             room.setInteriors(interiors);
             room.setPrice(price); // ✅ lưu giá phòng
             room.setHasContract(false);
-
-            db.collection("rooms").add(room)
-                    .addOnSuccessListener(ref -> {
-                        Toast.makeText(this, "Thêm phòng thành công", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                        loadRoomsByStatus(currentFilter);
-                    });
+// kiểm tra trùng số phòng trên Firestore trước khi thêm
+            db.collection("rooms").whereEqualTo("number", num)
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        if (!querySnapshot.isEmpty()) {
+                            Toast.makeText(this, "Số phòng đã tồn tại!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        // thêm phòng
+                        db.collection("rooms").add(room)
+                                .addOnSuccessListener(ref -> {
+                                    Toast.makeText(this, "Thêm phòng thành công", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    loadRoomsByStatus(currentFilter);
+                                })
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(this, "Lỗi thêm phòng: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                );
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "Lỗi kiểm tra trùng: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
         });
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
