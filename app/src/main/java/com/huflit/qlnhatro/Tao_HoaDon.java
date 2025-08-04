@@ -141,7 +141,7 @@ public class Tao_HoaDon extends AppCompatActivity {
                     Room room = doc.toObject(Room.class);
                     if (room != null) {
                         room.setId(doc.getId());
-                        // Chỉ thêm phòng nếu đang thuê (có trong danh sách hợp đồng)
+                        // Chỉ thêm phòng nếu đang thuê
                         if (rentedRoomIds.contains(room.getId())) {
                             roomList.add(room);
                         }
@@ -159,9 +159,14 @@ public class Tao_HoaDon extends AppCompatActivity {
                     }
                 });
 
-                // Tạo danh sách hiển thị
+                // Tạo danh sách hiển thị với SỐ THỨ TỰ + GIÁ
+                int index = 1;
                 for (Room r : roomList) {
-                    roomDisplayList.add("Phòng " + r.getNumber());
+                    String giaPhong = (r.getPrice() > 0)
+                            ? String.format("%,.0f VNĐ", r.getPrice())
+                            : "Chưa có giá";
+                    roomDisplayList.add(index + ". Phòng " + r.getNumber() + " - " + giaPhong);
+                    index++;
                 }
 
                 // Gán vào Spinner
@@ -224,26 +229,31 @@ public class Tao_HoaDon extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Room selectedRoom = roomList.get(position);
-                String selectedRoomId = selectedRoom.getId();
                 maPhong = selectedRoom.getNumber();
-                db.collection("contracts").whereEqualTo("roomId", selectedRoomId).limit(1).get()
+
+                // Gán giá phòng vào ô tiền phòng
+                if (selectedRoom.getPrice() > 0) {
+                    edtTienPhong.setText(String.valueOf((long) selectedRoom.getPrice()));
+                } else {
+                    edtTienPhong.setText("0");
+                }
+
+                db.collection("contracts").whereEqualTo("roomId", selectedRoom.getId()).limit(1).get()
                         .addOnSuccessListener(queryDocumentSnapshots -> {
                             if (!queryDocumentSnapshots.isEmpty()) {
                                 DocumentSnapshot contractDoc = queryDocumentSnapshots.getDocuments().get(0);
                                 tenNguoi = contractDoc.getString("tenantName");
-                                if (tenNguoi != null && !tenNguoi.trim().isEmpty()) {
-                                    tvTenNguoiThue.setText(tenNguoi);
-                                    btnLuu.setEnabled(true);
-                                } else {
-                                    tvTenNguoiThue.setText("Phòng này chưa có người thuê");
-                                    btnLuu.setEnabled(false);
-                                }
+                                tvTenNguoiThue.setText((tenNguoi != null && !tenNguoi.trim().isEmpty()) ? tenNguoi : "Phòng này chưa có người thuê");
+                                btnLuu.setEnabled(tenNguoi != null && !tenNguoi.trim().isEmpty());
                             } else {
                                 tvTenNguoiThue.setText("Không có hợp đồng cho phòng này");
                                 btnLuu.setEnabled(false);
                             }
                         });
+
+                capNhatTongTien();
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 btnLuu.setEnabled(false);
@@ -252,27 +262,30 @@ public class Tao_HoaDon extends AppCompatActivity {
     }
 
     private void capNhatTongTien() {
-        String soDienStr = edtSoDien.getText().toString().trim();
-        String soNuocStr = edtSoNuoc.getText().toString().trim();
-        String tienPhongStr = edtTienPhong.getText().toString().trim();
-
         try {
-            this.soDien = soDienStr.isEmpty() ? 0 : Double.parseDouble(soDienStr);
-            this.soNuoc = soNuocStr.isEmpty() ? 0 : Double.parseDouble(soNuocStr);
-            this.tienPhong = tienPhongStr.isEmpty() ? 0 : Double.parseDouble(tienPhongStr);
+            soDien = parseDoubleOrZero(edtSoDien.getText().toString().trim());
+            soNuoc = parseDoubleOrZero(edtSoNuoc.getText().toString().trim());
+            tienPhong = parseDoubleOrZero(edtTienPhong.getText().toString().trim());
 
-            // SỬA LỖI: Sử dụng đơn giá động đã tải từ Firebase
-            this.tienDien = this.soDien * donGiaDien;
-            this.tienNuoc = this.soNuoc * donGiaNuoc;
+            tienDien = soDien * donGiaDien;
+            tienNuoc = soNuoc * donGiaNuoc;
+
         } catch (NumberFormatException e) {
-            this.tienDien = this.tienNuoc = this.tienPhong = 0;
+            tienDien = tienNuoc = tienPhong = 0;
         }
 
         tvThanhTienDien.setText(String.format(Locale.getDefault(), "Thành tiền: %,.0f VNĐ", tienDien));
         tvThanhTienNuoc.setText(String.format(Locale.getDefault(), "Thành tiền: %,.0f VNĐ", tienNuoc));
+        tvTongTien.setText(String.format(Locale.getDefault(), "%,.0f VNĐ", (tienDien + tienNuoc + tienPhong)));
+    }
 
-        double tong = tienDien + tienNuoc + tienPhong;
-        tvTongTien.setText(String.format(Locale.getDefault(), "%,.0f VNĐ", tong));
+    private double parseDoubleOrZero(String value) {
+        if (value.isEmpty()) return 0;
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     private void checkAndSaveInvoice(final HoaDon hoaDon) {
@@ -281,22 +294,19 @@ public class Tao_HoaDon extends AppCompatActivity {
         Calendar calNew = Calendar.getInstance();
         try {
             Date newDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(hoaDon.getNgayLap());
-            if (newDate != null) {
-                calNew.setTime(newDate);
-            }
+            if (newDate != null) calNew.setTime(newDate);
         } catch (ParseException e) {
             Toast.makeText(this, "Lỗi định dạng ngày", Toast.LENGTH_SHORT).show();
             btnLuu.setEnabled(true);
             return;
         }
+
         final int currentMonth = calNew.get(Calendar.MONTH);
         final int currentYear = calNew.get(Calendar.YEAR);
 
-        db.collection("HoaDon")
-                .whereEqualTo("maPhong", hoaDon.getMaPhong())
-                .get()
+        db.collection("HoaDon").whereEqualTo("maPhong", hoaDon.getMaPhong()).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    boolean invoiceExistsForMonth = false;
+                    boolean exists = false;
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         HoaDon existingHoaDon = doc.toObject(HoaDon.class);
                         try {
@@ -304,31 +314,23 @@ public class Tao_HoaDon extends AppCompatActivity {
                             if (existingDate != null) {
                                 Calendar calExisting = Calendar.getInstance();
                                 calExisting.setTime(existingDate);
-                                int existingMonth = calExisting.get(Calendar.MONTH);
-                                int existingYear = calExisting.get(Calendar.YEAR);
-
-                                if (existingMonth == currentMonth && existingYear == currentYear) {
-                                    invoiceExistsForMonth = true;
+                                if (calExisting.get(Calendar.MONTH) == currentMonth && calExisting.get(Calendar.YEAR) == currentYear) {
+                                    exists = true;
                                     break;
                                 }
                             }
-                        } catch (ParseException e) {
-                            Log.e("Tao_HoaDon", "Lỗi parse ngày hóa đơn cũ: " + existingHoaDon.getNgayLap());
-                        }
+                        } catch (ParseException ignored) {}
                     }
 
-                    if (invoiceExistsForMonth) {
-                        Toast.makeText(this, "Phòng này đã có hóa đơn trong tháng. Vui lòng xóa hóa đơn cũ để tạo mới.", Toast.LENGTH_LONG).show();
+                    if (exists) {
+                        Toast.makeText(this, "Phòng này đã có hóa đơn trong tháng này.", Toast.LENGTH_LONG).show();
                         btnLuu.setEnabled(true);
                     } else {
                         luuHoaDonLenFirestore(hoaDon);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi khi kiểm tra hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    btnLuu.setEnabled(true);
                 });
     }
+
 
     private void luuHoaDonLenFirestore(HoaDon hoaDon) {
         db.collection("HoaDon").add(hoaDon).addOnSuccessListener(documentReference -> {

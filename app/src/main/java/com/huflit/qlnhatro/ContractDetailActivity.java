@@ -89,12 +89,33 @@ public class ContractDetailActivity extends AppCompatActivity {
                     tvEndDate.setText(
                             DATE_FORMAT.format(new Date(c.getEndDate())));
 
-                    // 2) Header phòng
+                    // 2) Header phòng + giá phòng
                     db.collection("rooms").document(c.getRoomId()).get()
                             .addOnSuccessListener(rdoc -> {
                                 Room r = rdoc.toObject(Room.class);
-                                if (r != null)
+                                if (r != null) {
                                     tvContractHeader.setText("HỢP ĐỒNG PHÒNG " + r.getNumber());
+
+                                    // Tìm TextView giá phòng trong layout
+                                    TextView tvRoomPrice = findViewById(R.id.tvRoomPrice);
+                                    double priceToShow = 0;
+
+                                    // Nếu contract có giá phòng -> ưu tiên
+                                    if (c.getRoomPrice() > 0) {
+                                        priceToShow = c.getRoomPrice();
+                                    }
+                                    // Nếu contract chưa có giá -> lấy từ Room
+                                    else if (r.getPrice() > 0) {
+                                        priceToShow = r.getPrice();
+                                    }
+
+                                    if (priceToShow > 0) {
+                                        tvRoomPrice.setText(String.format(Locale.getDefault(),
+                                                "%,.0f VNĐ", priceToShow));
+                                    } else {
+                                        tvRoomPrice.setText("Chưa có giá");
+                                    }
+                                }
                             });
 
                     // 3) Thông tin text
@@ -110,7 +131,7 @@ public class ContractDetailActivity extends AppCompatActivity {
                             try (InputStream is = getContentResolver().openInputStream(imageUri)) {
                                 ivContractImage.setImageBitmap(BitmapFactory.decodeStream(is));
                             } catch (Exception e) {
-                                ivContractImage.setImageResource(R.drawable.phongngu); // ảnh mặc định bạn muốn
+                                ivContractImage.setImageResource(R.drawable.phongngu); // ảnh mặc định
                             }
                         } else {
                             Glide.with(this)
@@ -119,7 +140,7 @@ public class ContractDetailActivity extends AppCompatActivity {
                                     .into(ivContractImage);
                         }
                     } else {
-                        ivContractImage.setImageResource(R.drawable.phongngu); // ảnh mặc định bạn muốn
+                        ivContractImage.setImageResource(R.drawable.phongngu); // ảnh mặc định
                     }
 
                 })
@@ -128,6 +149,7 @@ public class ContractDetailActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show()
                 );
     }
+
 
     private void showFullScreenImage(Uri uri) {
         if (uri == null) return;

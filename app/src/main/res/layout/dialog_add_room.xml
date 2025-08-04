@@ -46,105 +46,113 @@
             android:textStyle="bold"
             android:layout_marginTop="16dp"/>
 
+        <!-- Nút Hủy và Lưu -->
         <GridLayout
             android:id="@+id/glInteriors"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="4"
+            android:layout_marginTop="8dp"
             android:alignmentMode="alignMargins"
-            android:useDefaultMargins="true"
-            android:layout_marginTop="8dp">
+            android:columnCount="4"
+            android:useDefaultMargins="true">
 
             <ImageButton
                 android:id="@+id/btnBed"
-                android:tag="bed"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:src="@drawable/bed"
-                android:contentDescription="Giường"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Giường"
+                android:src="@drawable/bed"
+                android:tag="bed" />
 
             <ImageButton
                 android:id="@+id/btnMaylanh"
-                android:tag="air_conditioner"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:src="@drawable/air_conditioner"
-                android:contentDescription="Máy lạnh"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Máy lạnh"
+                android:src="@drawable/air_conditioner"
+                android:tag="air_conditioner" />
 
             <ImageButton
                 android:id="@+id/btnMayquat"
-                android:tag="fan"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="60dp"
                 android:layout_height="64dp"
-                android:src="@drawable/fan"
-                android:contentDescription="Máy quạt"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Máy quạt"
+                android:src="@drawable/fan"
+                android:tag="fan" />
 
             <ImageButton
                 android:id="@+id/btnTV"
-                android:tag="television"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="60dp"
                 android:layout_height="64dp"
-                android:src="@drawable/television"
-                android:contentDescription="Tivi"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Tivi"
+                android:src="@drawable/television"
+                android:tag="television" />
 
             <ImageButton
                 android:id="@+id/btnTuLanh"
-                android:tag="fridge"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="60dp"
                 android:layout_height="64dp"
-                android:src="@drawable/fridge"
-                android:contentDescription="Tủ lạnh"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Tủ lạnh"
+                android:src="@drawable/fridge"
+                android:tag="fridge" />
 
             <ImageButton
                 android:id="@+id/btnMaygiat"
-                android:tag="maygiat"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="60dp"
                 android:layout_height="64dp"
-                android:src="@drawable/maygiat"
-                android:contentDescription="Máy giặt"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Máy giặt"
+                android:src="@drawable/maygiat"
+                android:tag="maygiat" />
 
             <ImageButton
                 android:id="@+id/btnCooking"
-                android:tag="cooking"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="60dp"
                 android:layout_height="64dp"
-                android:src="@drawable/cooking"
-                android:contentDescription="Nấu ăn"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Nấu ăn"
+                android:src="@drawable/cooking"
+                android:tag="cooking" />
 
             <ImageButton
                 android:id="@+id/btnWifi"
-                android:tag="wi_fi_icon"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="60dp"
                 android:layout_height="64dp"
-                android:src="@drawable/wi_fi_icon"
-                android:contentDescription="Wifi"
+                android:alpha="0.4"
                 android:backgroundTint="@color/white"
-                android:alpha="0.4"/>
+                android:contentDescription="Wifi"
+                android:src="@drawable/wi_fi_icon"
+                android:tag="wi_fi_icon" />
         </GridLayout>
+        <EditText
+            android:id="@+id/etDialogRoomPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Giá phòng (VNĐ)"
+            android:inputType="number"
+            android:padding="8dp"
+            android:layout_marginTop="8dp"/>
 
-        <!-- Nút Hủy và Lưu -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

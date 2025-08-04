@@ -151,15 +151,28 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"/>
 
+        <TextView
+            android:id="@+id/tvRoomPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giá phòng"
+            android:textColor="@color/red"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="15dp"/>
+
+
+
+        <!-- Nút Xóa -->
         <ImageView
             android:id="@+id/ivContractImage"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:background="#EEEEEE"/>
+            android:background="#EEEEEE"
+            android:scaleType="centerCrop" />
 
-        <!-- Nút Xóa -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDelete"
             android:layout_width="match_parent"

@@ -15,6 +15,8 @@ public class Room {
     private List<String> interiors; // Danh sách mã nội thất ("bed", "table", ...)
     private boolean hasContract;
 
+    private double price; // 🆕 Giá thuê phòng
+
     // Constructor mặc định cho Firestore
     public Room() {
     }
@@ -80,6 +82,9 @@ public class Room {
     }
     public boolean isHasContract() { return hasContract; }
     public void setHasContract(boolean hasContract) { this.hasContract = hasContract; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
     @Override
     public String toString() {

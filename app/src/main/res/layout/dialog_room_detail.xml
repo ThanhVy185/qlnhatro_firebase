@@ -53,6 +53,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"/>
         </HorizontalScrollView>
+        <TextView
+            android:id="@+id/tvDetailPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giá: "
+            android:layout_marginTop="8dp"/>
+
 
         <!-- Nút Hủy và Lưu (nếu cần cập nhật chi tiết) -->
         <LinearLayout

@@ -91,4 +91,15 @@ public class Contract {
 
     public long getEndDate() { return endDate; }
     public void setEndDate(long endDate) { this.endDate = endDate; }
+
+    private double roomPrice;
+
+    public double getRoomPrice() {
+        return roomPrice;
+    }
+
+    public void setRoomPrice(double roomPrice) {
+        this.roomPrice = roomPrice;
+    }
+
 }

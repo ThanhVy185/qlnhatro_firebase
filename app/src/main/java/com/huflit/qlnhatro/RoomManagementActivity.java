@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -163,11 +164,27 @@ public class RoomManagementActivity extends AppCompatActivity {
         EditText etNum = view.findViewById(R.id.etDialogRoomNumber);
         EditText etName = view.findViewById(R.id.etDialogRoomName);
         EditText etMax = view.findViewById(R.id.etDialogRoomMax);
+        EditText etPrice = view.findViewById(R.id.etDialogRoomPrice); // ✅ ô giá phòng
         GridLayout gl = view.findViewById(R.id.glInteriors);
         Button btnSave = view.findViewById(R.id.btnDialogSave);
         Button btnCancel = view.findViewById(R.id.btnDialogCancel);
 
-        // Chọn nội thất (toggle)
+        final int giaNoiThat = 250_000; // ✅ 250k cho mỗi nội thất
+
+        // Hàm tính giá phòng
+        Runnable updatePrice = () -> {
+            int count = 0;
+            for (int i = 0; i < gl.getChildCount(); i++) {
+                View c = gl.getChildAt(i);
+                if (c instanceof ImageButton && c.isSelected()) {
+                    count++;
+                }
+            }
+            int totalPrice = count * giaNoiThat;
+            etPrice.setText(String.valueOf(totalPrice)); // ✅ cập nhật giá phòng
+        };
+
+        // Toggle chọn nội thất
         for (int i = 0; i < gl.getChildCount(); i++) {
             View c = gl.getChildAt(i);
             if (c instanceof ImageButton) {
@@ -177,6 +194,7 @@ public class RoomManagementActivity extends AppCompatActivity {
                     boolean sel = !ib.isSelected();
                     ib.setSelected(sel);
                     ib.setAlpha(sel ? 1f : 0.4f);
+                    updatePrice.run(); // ✅ mỗi lần chọn/bỏ chọn -> tính lại giá
                 });
             }
         }
@@ -185,66 +203,57 @@ public class RoomManagementActivity extends AppCompatActivity {
             String num = etNum.getText().toString().trim();
             String name = etName.getText().toString().trim();
             String maxStr = etMax.getText().toString().trim();
+            String priceStr = etPrice.getText().toString().trim();
 
-            // Validate rỗng
             if (TextUtils.isEmpty(num) || TextUtils.isEmpty(name) || TextUtils.isEmpty(maxStr)) {
                 Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Validate số người tối đa
+            // Kiểm tra trùng số phòng
+            for (Room ex : roomList) {
+                if (num.equals(ex.getNumber())) {
+                    Toast.makeText(this, "Số phòng đã tồn tại!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
             int maxOcc;
             try {
                 maxOcc = Integer.parseInt(maxStr);
-                if (maxOcc <= 0) throw new NumberFormatException();
             } catch (NumberFormatException ex) {
-                Toast.makeText(this, "Số tối đa phải là số nguyên dương", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Số tối đa phải là số", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // 🛑 Check trùng số phòng trên Firestore
-            db.collection("rooms")
-                    .whereEqualTo("number", num)
-                    .get()
-                    .addOnSuccessListener(snapshot -> {
-                        if (!snapshot.isEmpty()) {
-                            Toast.makeText(this, "Số phòng này đã tồn tại!", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+            double price = 0;
+            try {
+                price = Double.parseDouble(priceStr);
+            } catch (NumberFormatException ignored) {}
 
-                        // Gom danh sách nội thất
-                        List<String> interiors = new ArrayList<>();
-                        for (int i = 0; i < gl.getChildCount(); i++) {
-                            View c = gl.getChildAt(i);
-                            if (c instanceof ImageButton && c.isSelected()) {
-                                Object tag = c.getTag();
-                                if (tag instanceof String) interiors.add((String) tag);
-                            }
-                        }
+            List<String> interiors = new ArrayList<>();
+            for (int i = 0; i < gl.getChildCount(); i++) {
+                View c = gl.getChildAt(i);
+                if (c instanceof ImageButton && c.isSelected()) {
+                    Object tag = c.getTag();
+                    if (tag instanceof String) interiors.add((String) tag);
+                }
+            }
 
-                        // Tạo mới phòng
-                        Room room = new Room();
-                        room.setNumber(num);
-                        room.setName(name);
-                        room.setMaxOccupancy(maxOcc);
-                        room.setInteriors(interiors);
-                        room.setHasContract(false);
+            Room room = new Room();
+            room.setNumber(num);
+            room.setName(name);
+            room.setMaxOccupancy(maxOcc);
+            room.setInteriors(interiors);
+            room.setPrice(price); // ✅ lưu giá phòng
+            room.setHasContract(false);
 
-                        // Lưu vào Firestore
-                        db.collection("rooms")
-                                .add(room)
-                                .addOnSuccessListener(ref -> {
-                                    Toast.makeText(this, "Thêm phòng thành công", Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
-                                    loadRoomsByStatus(currentFilter); // Giữ nguyên filter hiện tại
-                                })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(this, "Lỗi thêm phòng: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                                );
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Lỗi kiểm tra số phòng: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
+            db.collection("rooms").add(room)
+                    .addOnSuccessListener(ref -> {
+                        Toast.makeText(this, "Thêm phòng thành công", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        loadRoomsByStatus(currentFilter);
+                    });
         });
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
@@ -252,12 +261,21 @@ public class RoomManagementActivity extends AppCompatActivity {
     }
 
 
+
     // ===== Dialog chi tiết =====
     private void showRoomDetailDialog(Room room) {
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_room_detail, null);
-        ((TextView) view.findViewById(R.id.tvDetailNumber)).setText("Phòng: " + room.getNumber());
-        ((TextView) view.findViewById(R.id.tvDetailName)).setText("Tên: " + room.getName());
-        ((TextView) view.findViewById(R.id.tvDetailMax)).setText("Số tối đa: " + room.getMaxOccupancy() + " người");
+
+        ((TextView) view.findViewById(R.id.tvDetailNumber))
+                .setText("Phòng: " + room.getNumber());
+        ((TextView) view.findViewById(R.id.tvDetailName))
+                .setText("Tên: " + room.getName());
+        ((TextView) view.findViewById(R.id.tvDetailMax))
+                .setText("Số tối đa: " + room.getMaxOccupancy() + " người");
+
+        // ✅ Thêm giá phòng
+        ((TextView) view.findViewById(R.id.tvDetailPrice))
+                .setText(String.format(Locale.getDefault(), "Giá: %,.0f VNĐ", room.getPrice()));
 
         LinearLayout ll = view.findViewById(R.id.llInterior);
         ll.removeAllViews();
@@ -277,8 +295,12 @@ public class RoomManagementActivity extends AppCompatActivity {
             }
         }
 
-        new AlertDialog.Builder(this).setView(view).setPositiveButton("Đóng", null).show();
+        new AlertDialog.Builder(this)
+                .setView(view)
+                .setPositiveButton("Đóng", null)
+                .show();
     }
+
 
     // ===== Menu hành động =====
     private void showOptionsDialog(Room room) {
@@ -300,20 +322,37 @@ public class RoomManagementActivity extends AppCompatActivity {
         EditText etNum = v.findViewById(R.id.etDialogRoomNumber);
         EditText etName = v.findViewById(R.id.etDialogRoomName);
         EditText etMax = v.findViewById(R.id.etDialogRoomMax);
+        EditText etPrice = v.findViewById(R.id.etDialogRoomPrice); // ✅ giá phòng
         GridLayout gl = v.findViewById(R.id.glInteriors);
         Button btnSave = v.findViewById(R.id.btnDialogSave);
         Button btnCancel = v.findViewById(R.id.btnDialogCancel);
+
+        final int giaNoiThat = 250_000;
 
         // Điền giá trị cũ
         etNum.setText(room.getNumber());
         etName.setText(room.getName());
         etMax.setText(String.valueOf(room.getMaxOccupancy()));
+        etPrice.setText(String.valueOf(room.getPrice())); // ✅ giá phòng cũ
 
-        // ❌ Không cho sửa số phòng & tên phòng
+        // Không cho sửa số phòng & tên phòng
         etNum.setEnabled(false);
         etNum.setFocusable(false);
         etName.setEnabled(false);
         etName.setFocusable(false);
+
+        // Hàm tính giá phòng
+        Runnable updatePrice = () -> {
+            int count = 0;
+            for (int i = 0; i < gl.getChildCount(); i++) {
+                View c = gl.getChildAt(i);
+                if (c instanceof ImageButton && c.isSelected()) {
+                    count++;
+                }
+            }
+            int totalPrice = count * giaNoiThat;
+            etPrice.setText(String.valueOf(totalPrice));
+        };
 
         // Thiết lập toggle nội thất
         Set<String> selectedTags = new HashSet<>();
@@ -332,6 +371,7 @@ public class RoomManagementActivity extends AppCompatActivity {
                     boolean now = !ib.isSelected();
                     ib.setSelected(now);
                     ib.setAlpha(now ? 1f : 0.4f);
+                    updatePrice.run(); // ✅ tự tính lại khi bật/tắt
                 });
             }
         }
@@ -346,6 +386,7 @@ public class RoomManagementActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(x -> {
             String maxS = etMax.getText().toString().trim();
+            String priceS = etPrice.getText().toString().trim();
             if (TextUtils.isEmpty(maxS)) {
                 Toast.makeText(this, "Nhập số tối đa", Toast.LENGTH_SHORT).show();
                 return;
@@ -360,6 +401,11 @@ public class RoomManagementActivity extends AppCompatActivity {
                 return;
             }
 
+            double price = 0;
+            try {
+                price = Double.parseDouble(priceS);
+            } catch (NumberFormatException ignored) {}
+
             List<String> interiors = new ArrayList<>();
             for (int i = 0; i < gl.getChildCount(); i++) {
                 View c = gl.getChildAt(i);
@@ -371,8 +417,9 @@ public class RoomManagementActivity extends AppCompatActivity {
 
             Map<String, Object> upd = new HashMap<>();
             upd.put("maxOccupancy", maxOcc);
+            upd.put("price", price); // ✅ cập nhật giá phòng
             upd.put("interiors", interiors);
-            upd.put("hasContract", room.isHasContract()); // giữ nguyên
+            upd.put("hasContract", room.isHasContract());
 
             db.collection("rooms")
                     .document(room.getId())
@@ -380,7 +427,7 @@ public class RoomManagementActivity extends AppCompatActivity {
                     .addOnSuccessListener(a -> {
                         Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        loadRoomsByStatus(currentFilter); // Giữ nguyên filter
+                        loadRoomsByStatus(currentFilter);
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show()

@@ -1,9 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- … các style khác … -->
-
-    <style name="Theme.App.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowBackground">@android:color/white</item>
-    </style>
-</resources>
+<!-- res/drawable/bg_paid.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#E8F5E9"/> <!-- Xanh lá -->
+    <corners android:radius="50dp"/>
+    <padding
+        android:left="8dp"
+        android:top="4dp"
+        android:right="8dp"
+        android:bottom="4dp"/>
+</shape>

@@ -5,13 +5,16 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -301,11 +304,15 @@ public class ContractManagementActivity extends AppCompatActivity {
             // Tạo và lưu Contract
             Room sel = availableRooms.get(spnRoom.getSelectedItemPosition());
             Contract c = new Contract();
+            Room selectedRoom = availableRooms.get(spnRoom.getSelectedItemPosition());
+            c.setRoomPrice(selectedRoom.getPrice()); // Lưu giá phòng vào hợp đồng
+
             c.setContractCode(code);
             c.setTenantName(tenant);
             c.setIdentityNumber(idNum);
             c.setRoomId(sel.getId());
             c.setRoomNumber(sel.getNumber());
+
             c.setImageUrl(selectedImageUriGlobal);
             try {
                 c.setCreateDate(DATE_FORMAT.parse(etCreateDate.getText().toString()).getTime());
@@ -326,6 +333,25 @@ public class ContractManagementActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
+
+        TextView tvRoomPrice = dialog.findViewById(R.id.tvRoomPrice);
+
+        spnRoom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Room selectedRoom = availableRooms.get(position);
+                double price = selectedRoom.getPrice();
+                String priceText = (price > 0)
+                        ? String.format(Locale.getDefault(), "Giá phòng: %,.0f VNĐ", price)
+                        : "Giá phòng: Chưa có";
+                tvRoomPrice.setText(priceText);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                tvRoomPrice.setText("Giá phòng: -");
+            }
+        });
     }
 
     @Override
