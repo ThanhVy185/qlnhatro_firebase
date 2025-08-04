@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.huflit.qlnhatro.Adapter.RoomAdapter;
+import Adapter.RoomAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;

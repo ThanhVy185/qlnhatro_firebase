@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app   ="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:background="#FAF5FF">
 
-    <!-- Thanh nút điều hướng -->
-    <LinearLayout
-        android:id="@+id/tabsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:orientation="horizontal"
-        android:background="#79D57A"
-        android:padding="8dp">
-
-        <Button
-            android:id="@+id/btnGoRooms"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:backgroundTint="#79D57A"
-            android:text="Phòng"
-            android:textSize="20dp"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="15dp"/>
-    </LinearLayout>
+    <!-- Header -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="QUẢN LÝ PHÒNG"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Bộ lọc phòng -->
     <RadioGroup
         android:id="@+id/rgRoomFilter"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tabsLayout"
         android:orientation="horizontal"
         android:gravity="center"
-        android:padding="8dp">
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <RadioButton
             android:id="@+id/rbAll"
@@ -49,34 +48,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Phòng trống"
-            app:buttonTint="@color/myCheckedColor"/>
+            app:buttonTint="@color/myCheckedColor"
+            android:layout_marginStart="16dp"/>
 
         <RadioButton
             android:id="@+id/rbRented"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Đã thuê"
-            app:buttonTint="@color/myCheckedColor"/>
+            app:buttonTint="@color/myCheckedColor"
+            android:layout_marginStart="16dp"/>
     </RadioGroup>
 
     <!-- RecyclerView hiển thị grid phòng -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRooms"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/rgRoomFilter"
-        android:layout_above="@+id/fabAddRoom"
-        android:padding="8dp"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="4dp"
+        app:layout_constraintTop_toBottomOf="@id/rgRoomFilter"
+        app:layout_constraintBottom_toTopOf="@+id/fabAddRoom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Nút + để mở form thêm phòng -->
+    <!-- FloatingActionButton thêm phòng -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddRoom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
         app:srcCompat="@drawable/ic_add"
         android:tint="@android:color/white"
-        android:backgroundTint="#B8FFB8"/>
-</RelativeLayout>
+        android:contentDescription="Thêm phòng"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

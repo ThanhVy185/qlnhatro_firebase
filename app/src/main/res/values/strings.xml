@@ -4,4 +4,22 @@
     <string name="desc_contract_icon">Icon hợp đồng</string>
     <string name="desc_splash_logo">Icon Nhà trọ</string>
 
+    <string name="title_quanly_noiquy">QUẢN LÝ NỘI QUY</string>
+
+    <!-- Tên Danh Mục -->
+    <string name="dm_vesinh">Nội quy vệ sinh</string>
+    <string name="dm_anninh">Nội quy an ninh trật tự</string>
+    <string name="dm_antoan">Nội quy an toàn chung</string>
+    <string name="dm_pccc">Nội quy phòng cháy chữa cháy</string>
+
+    <!-- Dialog Thêm/Sửa Nội Quy -->
+    <string name="dlg_add_rule">Thêm nội quy</string>
+    <string name="dlg_edit_rule">Sửa nội quy</string>
+    <string name="hint_rule_text">Nội dung quy định…</string>
+    <string name="btn_luu">Lưu</string>
+    <string name="btn_huy">Hủy</string>
+
+    <!-- Xác nhận Xóa -->
+    <string name="confirm_delete_title">Xóa nội quy</string>
+    <string name="confirm_delete_msg">Bạn có chắc muốn xóa nội quy này?</string>
 </resources>

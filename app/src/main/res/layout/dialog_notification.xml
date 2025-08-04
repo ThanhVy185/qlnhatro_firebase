@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Nút mở Multi-Select cho phòng -->
+    <Button
+        android:id="@+id/btnSelectRooms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn phòng nhận thông báo" />
+
+    <!-- Hiển thị phòng đã chọn -->
+    <TextView
+        android:id="@+id/tvSelectedRooms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="(Chưa chọn)"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Tiêu đề thông báo -->
+    <EditText
+        android:id="@+id/etNotifTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tiêu đề"
+        android:inputType="text"/>
+
+    <!-- Nội dung thông báo -->
+    <EditText
+        android:id="@+id/etNotifContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nội dung"
+        android:inputType="textMultiLine"
+        android:minLines="4"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>

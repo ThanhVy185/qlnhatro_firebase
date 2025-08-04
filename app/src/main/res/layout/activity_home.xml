@@ -76,15 +76,15 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@android:drawable/ic_dialog_map"
-                    app:tint="#00C853" />
+                    android:src="@drawable/ic_room"
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:gravity="center"
-                    android:text="Quản Lý Phòng\nvà Người Thuê"
+                    android:text="Quản Lý Phòng"
                     android:textColor="#4A5568"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -113,8 +113,8 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@android:drawable/ic_menu_agenda"
-                    app:tint="#00C853" />
+                    android:src="@drawable/ic_contract"
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -150,8 +150,8 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@android:drawable/ic_menu_send"
-                    app:tint="#00C853" />
+                    android:src="@drawable/ic_bill"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -188,8 +188,8 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@android:drawable/ic_menu_view"
-                    app:tint="#00C853" />
+                    android:src="@drawable/ic_chart"
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -224,8 +224,8 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    app:srcCompat="@drawable/energy"
-                    app:tint="#00C853" />
+                    app:srcCompat="@drawable/ic_energy"
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -235,6 +235,78 @@
                     android:text="Quản lý Điện/Nước"
                     android:textColor="#4A5568"
                     android:textSize="14sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Thêm ngay dưới các card hiện tại -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnQLNoiQuy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Icon: bạn có thể thay bằng drawable phù hợp -->
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_rule"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="Quản Lý\nNội Quy"
+                    android:textColor="#4A5568"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Card Quản lý Thông báo -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnQLThongBao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0dp">
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_notification"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Quản lý Thông báo"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnBackground"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </GridLayout>

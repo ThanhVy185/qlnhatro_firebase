@@ -10,8 +10,8 @@
     <color name="green">#33E83A</color>
     <color name="red">#FF0000</color>
     <color name="selected_item_color">#E0E0E0</color>
+    <color name="rule_bg">#7932a8</color>
     <color name="myCheckedColor">#79D57A</color> <!-- Xanh -->
     <color name="green_dark">#388E3C</color>
     <color name="red_dark">#D32F2F</color>
 </resources>
-
