@@ -11,6 +11,8 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,16 +24,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.huflit.qlnhatro.Adapter.RoomAdapter;
-import Data.Room;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+
+import Data.Room;
 
 public class RoomManagementActivity extends AppCompatActivity {
 
@@ -39,6 +41,11 @@ public class RoomManagementActivity extends AppCompatActivity {
     private RoomAdapter roomAdapter;
     private FirebaseFirestore db;
     private List<Room> roomList = new ArrayList<>();
+    private RadioGroup rgRoomFilter;
+    private RadioButton rbAll, rbEmpty, rbRented;
+
+    // 🔹 Biến lưu filter hiện tại
+    private String currentFilter = "Tất cả";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,91 +61,113 @@ public class RoomManagementActivity extends AppCompatActivity {
                 new RoomAdapter.OnItemClickListener() {
                     @Override
                     public void onClick(Room room) {
-                        // Click 1 lần: xem chi tiết
                         showRoomDetailDialog(room);
                     }
+
                     @Override
                     public void onLongClick(Room room, int position) {
-                        // Long-click: hiện options dialog
                         showOptionsDialog(room);
                     }
                 });
         rvRooms.setAdapter(roomAdapter);
 
         // 2. FAB thêm phòng
-        findViewById(R.id.fabAddRoom)
-                .setOnClickListener(v -> showAddRoomDialog());
+        findViewById(R.id.fabAddRoom).setOnClickListener(v -> showAddRoomDialog());
 
-        // 3. Khởi tạo Firestore và load dữ liệu
+        // 3. Khởi tạo Firestore
         db = FirebaseFirestore.getInstance();
-        loadRoomsWithContracts();
+
+        // 4. Setup RadioGroup lọc phòng
+        rgRoomFilter = findViewById(R.id.rgRoomFilter);
+        rbAll = findViewById(R.id.rbAll);
+        rbEmpty = findViewById(R.id.rbEmpty);
+        rbRented = findViewById(R.id.rbRented);
+
+        rgRoomFilter.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rbAll) {
+                currentFilter = "Tất cả";
+            } else if (checkedId == R.id.rbEmpty) {
+                currentFilter = "Chưa thuê";
+            } else if (checkedId == R.id.rbRented) {
+                currentFilter = "Đã thuê";
+            }
+            loadRoomsByStatus(currentFilter);
+        });
+
+        // 5. Lần đầu vào load tất cả
+//        rbAll.setChecked(true);
+        currentFilter = "Tất cả";
+        rbAll.setChecked(true);
+        loadRoomsByStatus(currentFilter);
     }
-    // ===== Load phòng + hợp đồng =====
-    private void loadRoomsWithContracts() {
-        // Bước 1: Lấy tất cả hợp đồng để gom roomId
-        db.collection("contracts").get()
-                .addOnSuccessListener(cs -> {
-                    Set<String> hasContractIds = new HashSet<>();
-                    for (QueryDocumentSnapshot c : cs) {
-                        String roomId = c.getString("roomId");
-                        if (roomId != null) hasContractIds.add(roomId);
+
+    // ===== Load phòng theo filter =====
+    private void loadRoomsByStatus(String statusFilter) {
+        db.collection("contracts")
+                .get()
+                .addOnSuccessListener(contractSnapshots -> {
+                    Set<String> rentedRoomIds = new HashSet<>();
+                    for (QueryDocumentSnapshot doc : contractSnapshots) {
+                        String roomId = doc.getString("roomId");
+                        if (roomId != null) {
+                            rentedRoomIds.add(roomId);
+                        }
                     }
-                    // Bước 2: Load rooms và đánh dấu hasContract
-                    db.collection("rooms").get()
-                            .addOnSuccessListener(rs -> {
-                                roomList.clear();
-                                for (QueryDocumentSnapshot r : rs) {
-                                    Room room = r.toObject(Room.class);
-                                    room.setId(r.getId());
-                                    room.setHasContract(hasContractIds.contains(r.getId()));
-                                    roomList.add(room);
+
+                    db.collection("rooms")
+                            .get()
+                            .addOnSuccessListener(roomSnapshots -> {
+                                List<Room> filtered = new ArrayList<>();
+
+                                for (QueryDocumentSnapshot doc : roomSnapshots) {
+                                    Room room = doc.toObject(Room.class);
+                                    room.setId(doc.getId());
+
+                                    // Đánh dấu trạng thái thuê
+                                    boolean hasContract = rentedRoomIds.contains(room.getId());
+                                    room.setHasContract(hasContract);
+
+                                    if ("Tất cả".equals(statusFilter)) {
+                                        filtered.add(room);
+                                    } else if ("Đã thuê".equals(statusFilter) && hasContract) {
+                                        filtered.add(room);
+                                    } else if ("Chưa thuê".equals(statusFilter) && !hasContract) {
+                                        filtered.add(room);
+                                    }
                                 }
 
-                                // → Sắp xếp theo số phòng (nếu số không parse được thì theo chuỗi)
-                                Collections.sort(roomList, new Comparator<Room>() {
-                                    @Override
-                                    public int compare(Room a, Room b) {
-                                        try {
-                                            int na = Integer.parseInt(a.getNumber());
-                                            int nb = Integer.parseInt(b.getNumber());
-                                            return Integer.compare(na, nb);
-                                        } catch (NumberFormatException e) {
-                                            return a.getNumber().compareTo(b.getNumber());
-                                        }
+                                // Sắp xếp theo số phòng
+                                Collections.sort(filtered, (a, b) -> {
+                                    try {
+                                        int na = Integer.parseInt(a.getNumber());
+                                        int nb = Integer.parseInt(b.getNumber());
+                                        return Integer.compare(na, nb);
+                                    } catch (NumberFormatException e) {
+                                        return a.getNumber().compareTo(b.getNumber());
                                     }
                                 });
-                                roomAdapter.setRoomList(roomList);
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(this,
-                                            "Lỗi load phòng: " + e.getMessage(),
-                                            Toast.LENGTH_LONG).show()
-                            );
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this,
-                                "Lỗi load hợp đồng: " + e.getMessage(),
-                                Toast.LENGTH_LONG).show()
-                );
+
+                                roomAdapter.setRoomList(filtered);
+                            });
+                });
     }
 
     // ===== Dialog “Thêm phòng” =====
     private void showAddRoomDialog() {
-        View view = LayoutInflater.from(this)
-                .inflate(R.layout.dialog_add_room, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_room, null);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
                 .setCancelable(false)
                 .create();
 
-        EditText etNum    = view.findViewById(R.id.etDialogRoomNumber);
-        EditText etName   = view.findViewById(R.id.etDialogRoomName);
-        EditText etMax    = view.findViewById(R.id.etDialogRoomMax);
-        GridLayout gl     = view.findViewById(R.id.glInteriors);
-        Button btnSave    = view.findViewById(R.id.btnDialogSave);
-        Button btnCancel  = view.findViewById(R.id.btnDialogCancel);
+        EditText etNum = view.findViewById(R.id.etDialogRoomNumber);
+        EditText etName = view.findViewById(R.id.etDialogRoomName);
+        EditText etMax = view.findViewById(R.id.etDialogRoomMax);
+        GridLayout gl = view.findViewById(R.id.glInteriors);
+        Button btnSave = view.findViewById(R.id.btnDialogSave);
+        Button btnCancel = view.findViewById(R.id.btnDialogCancel);
 
-        // Toggle chọn nội thất
+        // Chọn nội thất (toggle)
         for (int i = 0; i < gl.getChildCount(); i++) {
             View c = gl.getChildAt(i);
             if (c instanceof ImageButton) {
@@ -156,67 +185,65 @@ public class RoomManagementActivity extends AppCompatActivity {
             String num = etNum.getText().toString().trim();
             String name = etName.getText().toString().trim();
             String maxStr = etMax.getText().toString().trim();
-            if (TextUtils.isEmpty(num) ||
-                    TextUtils.isEmpty(name) ||
-                    TextUtils.isEmpty(maxStr)) {
-                Toast.makeText(this,
-                        "Vui lòng nhập đầy đủ thông tin",
-                        Toast.LENGTH_SHORT).show();
+
+            // Validate rỗng
+            if (TextUtils.isEmpty(num) || TextUtils.isEmpty(name) || TextUtils.isEmpty(maxStr)) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // ⚠️ 2. Check trùng số phòng
-            for (Room ex : roomList) {
-                if (num.equals(ex.getNumber())) {
-                    Toast.makeText(this,
-                            "Số phòng này đã tồn tại!",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
+            // Validate số người tối đa
             int maxOcc;
             try {
                 maxOcc = Integer.parseInt(maxStr);
+                if (maxOcc <= 0) throw new NumberFormatException();
             } catch (NumberFormatException ex) {
-                Toast.makeText(this,
-                        "Số tối đa phải là số",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Số tối đa phải là số nguyên dương", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Gom interior dựa trên tag
-            List<String> interiors = new ArrayList<>();
-            for (int i = 0; i < gl.getChildCount(); i++) {
-                View c = gl.getChildAt(i);
-                if (c instanceof ImageButton && c.isSelected()) {
-                    Object tag = c.getTag();
-                    if (tag instanceof String) {
-                        interiors.add((String) tag);
-                    }
-                }
-            }
-
-            // Tạo và lưu Room mới
-            Room room = new Room();
-            room.setNumber(num);
-            room.setName(name);
-            room.setMaxOccupancy(maxOcc);
-            room.setInteriors(interiors);
-            room.setHasContract(false);
-
+            // 🛑 Check trùng số phòng trên Firestore
             db.collection("rooms")
-                    .add(room)
-                    .addOnSuccessListener(ref -> {
-                        Toast.makeText(this,
-                                "Thêm phòng thành công",
-                                Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                        loadRoomsWithContracts();
+                    .whereEqualTo("number", num)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        if (!snapshot.isEmpty()) {
+                            Toast.makeText(this, "Số phòng này đã tồn tại!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Gom danh sách nội thất
+                        List<String> interiors = new ArrayList<>();
+                        for (int i = 0; i < gl.getChildCount(); i++) {
+                            View c = gl.getChildAt(i);
+                            if (c instanceof ImageButton && c.isSelected()) {
+                                Object tag = c.getTag();
+                                if (tag instanceof String) interiors.add((String) tag);
+                            }
+                        }
+
+                        // Tạo mới phòng
+                        Room room = new Room();
+                        room.setNumber(num);
+                        room.setName(name);
+                        room.setMaxOccupancy(maxOcc);
+                        room.setInteriors(interiors);
+                        room.setHasContract(false);
+
+                        // Lưu vào Firestore
+                        db.collection("rooms")
+                                .add(room)
+                                .addOnSuccessListener(ref -> {
+                                    Toast.makeText(this, "Thêm phòng thành công", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    loadRoomsByStatus(currentFilter); // Giữ nguyên filter hiện tại
+                                })
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(this, "Lỗi thêm phòng: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                                );
                     })
                     .addOnFailureListener(e ->
-                            Toast.makeText(this,
-                                    "Lỗi thêm phòng: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Lỗi kiểm tra số phòng: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         });
 
@@ -224,83 +251,71 @@ public class RoomManagementActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    // ===== Dialog “Xem chi tiết” =====
-    private void showRoomDetailDialog(Room room) {
-        View view = LayoutInflater.from(this)
-                .inflate(R.layout.dialog_room_detail, null);
 
-        ((TextView) view.findViewById(R.id.tvDetailNumber))
-                .setText("Phòng: " + room.getNumber());
-        ((TextView) view.findViewById(R.id.tvDetailName))
-                .setText("Tên: " + room.getName());
-        ((TextView) view.findViewById(R.id.tvDetailMax))
-                .setText("Số tối đa: " + room.getMaxOccupancy() + " người");
+    // ===== Dialog chi tiết =====
+    private void showRoomDetailDialog(Room room) {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_room_detail, null);
+        ((TextView) view.findViewById(R.id.tvDetailNumber)).setText("Phòng: " + room.getNumber());
+        ((TextView) view.findViewById(R.id.tvDetailName)).setText("Tên: " + room.getName());
+        ((TextView) view.findViewById(R.id.tvDetailMax)).setText("Số tối đa: " + room.getMaxOccupancy() + " người");
 
         LinearLayout ll = view.findViewById(R.id.llInterior);
         ll.removeAllViews();
         if (room.getInteriors() != null) {
             for (String icon : room.getInteriors()) {
-                if (icon == null) continue;
-                int resId = getResources()
-                        .getIdentifier(icon.toLowerCase(),
-                                "drawable", getPackageName());
-                if (resId == 0) continue;
-                ImageView iv = new ImageView(this);
-                iv.setImageResource(resId);
-                LinearLayout.LayoutParams p =
-                        new LinearLayout.LayoutParams(100, 100);
-                p.setMargins(8, 0, 8, 0);
-                iv.setLayoutParams(p);
-                ll.addView(iv);
+                if (icon != null) {
+                    int resId = getResources().getIdentifier(icon.toLowerCase(), "drawable", getPackageName());
+                    if (resId != 0) {
+                        ImageView iv = new ImageView(this);
+                        iv.setImageResource(resId);
+                        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(100, 100);
+                        p.setMargins(8, 0, 8, 0);
+                        iv.setLayoutParams(p);
+                        ll.addView(iv);
+                    }
+                }
             }
         }
 
-        new AlertDialog.Builder(this)
-                .setView(view)
-                .setPositiveButton("Đóng", null)
-                .show();
+        new AlertDialog.Builder(this).setView(view).setPositiveButton("Đóng", null).show();
     }
 
+    // ===== Menu hành động =====
     private void showOptionsDialog(Room room) {
         new AlertDialog.Builder(this)
                 .setTitle("Chọn hành động cho phòng " + room.getNumber())
                 .setItems(new CharSequence[]{"Chi tiết", "Sửa phòng", "Xóa phòng"},
                         (dialog, which) -> {
-                            switch (which) {
-                                case 0:
-                                    showRoomDetailDialog(room);
-                                    break;
-                                case 1:
-                                    showEditRoomDialog(room);
-                                    break;
-                                case 2:
-                                    deleteRoom(room);
-                                    break;
-                            }
-                        })
-                .show();
+                            if (which == 0) showRoomDetailDialog(room);
+                            else if (which == 1) showEditRoomDialog(room);
+                            else if (which == 2) deleteRoom(room);
+                        }).show();
     }
 
-
+    // ===== Sửa phòng =====
     private void showEditRoomDialog(Room room) {
-        // Inflate layout dialog_add_room.xml
         View v = LayoutInflater.from(this)
                 .inflate(R.layout.dialog_add_room, null);
 
-        // Tìm các view trong dialog
-        EditText etNum    = v.findViewById(R.id.etDialogRoomNumber);
-        EditText etName   = v.findViewById(R.id.etDialogRoomName);
-        EditText etMax    = v.findViewById(R.id.etDialogRoomMax);
-        GridLayout gl     = v.findViewById(R.id.glInteriors);
-        Button btnSave    = v.findViewById(R.id.btnDialogSave);
-        Button btnCancel  = v.findViewById(R.id.btnDialogCancel);
+        EditText etNum = v.findViewById(R.id.etDialogRoomNumber);
+        EditText etName = v.findViewById(R.id.etDialogRoomName);
+        EditText etMax = v.findViewById(R.id.etDialogRoomMax);
+        GridLayout gl = v.findViewById(R.id.glInteriors);
+        Button btnSave = v.findViewById(R.id.btnDialogSave);
+        Button btnCancel = v.findViewById(R.id.btnDialogCancel);
 
-        // Prefill giá trị phòng hiện tại
+        // Điền giá trị cũ
         etNum.setText(room.getNumber());
         etName.setText(room.getName());
         etMax.setText(String.valueOf(room.getMaxOccupancy()));
 
-        // Thiết lập toggle cho các ImageButton nội thất theo room.getInteriors()
+        // ❌ Không cho sửa số phòng & tên phòng
+        etNum.setEnabled(false);
+        etNum.setFocusable(false);
+        etName.setEnabled(false);
+        etName.setFocusable(false);
+
+        // Thiết lập toggle nội thất
         Set<String> selectedTags = new HashSet<>();
         if (room.getInteriors() != null) {
             selectedTags.addAll(room.getInteriors());
@@ -321,27 +336,21 @@ public class RoomManagementActivity extends AppCompatActivity {
             }
         }
 
-        // Tạo AlertDialog chỉ với layout, không thêm positive/negative builder buttons
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Sửa phòng " + room.getNumber())
                 .setView(v)
                 .setCancelable(false)
                 .create();
 
-        // Nút Hủy: chỉ dismiss dialog
         btnCancel.setOnClickListener(x -> dialog.dismiss());
 
-        // Nút Lưu: validate + update Firestore
         btnSave.setOnClickListener(x -> {
-            String num   = etNum.getText().toString().trim();
-            String name  = etName.getText().toString().trim();
-            String maxS  = etMax.getText().toString().trim();
-            if (TextUtils.isEmpty(num) ||
-                    TextUtils.isEmpty(name) ||
-                    TextUtils.isEmpty(maxS)) {
-                Toast.makeText(this, "Nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+            String maxS = etMax.getText().toString().trim();
+            if (TextUtils.isEmpty(maxS)) {
+                Toast.makeText(this, "Nhập số tối đa", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             int maxOcc;
             try {
                 maxOcc = Integer.parseInt(maxS);
@@ -351,7 +360,6 @@ public class RoomManagementActivity extends AppCompatActivity {
                 return;
             }
 
-            // Gom các nội thất đang được chọn (tag là String)
             List<String> interiors = new ArrayList<>();
             for (int i = 0; i < gl.getChildCount(); i++) {
                 View c = gl.getChildAt(i);
@@ -361,23 +369,18 @@ public class RoomManagementActivity extends AppCompatActivity {
                 }
             }
 
-            // Chuẩn bị map để update
             Map<String, Object> upd = new HashMap<>();
-            upd.put("number", num);
-            upd.put("name", name);
             upd.put("maxOccupancy", maxOcc);
             upd.put("interiors", interiors);
-            // Giữ nguyên trạng thái hasContract
-            upd.put("hasContract", room.isHasContract());
+            upd.put("hasContract", room.isHasContract()); // giữ nguyên
 
-            // Ghi lên Firestore
             db.collection("rooms")
                     .document(room.getId())
                     .update(upd)
                     .addOnSuccessListener(a -> {
                         Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        loadRoomsWithContracts();  // reload danh sách để cập nhật UI
+                        loadRoomsByStatus(currentFilter); // Giữ nguyên filter
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show()
@@ -388,24 +391,26 @@ public class RoomManagementActivity extends AppCompatActivity {
     }
 
 
+    // ===== Xóa phòng =====
     private void deleteRoom(Room room) {
         new AlertDialog.Builder(this)
                 .setTitle("Xóa phòng")
                 .setMessage("Bạn có chắc muốn xóa phòng " + room.getNumber() + "?")
-                .setPositiveButton("Xóa", (d,i) -> {
-                    db.collection("rooms")
-                            .document(room.getId())
-                            .delete()
-                            .addOnSuccessListener(a -> {
-                                Toast.makeText(this,"Đã xóa",Toast.LENGTH_SHORT).show();
-                                loadRoomsWithContracts();
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(this,"Lỗi xóa: "+e.getMessage(),Toast.LENGTH_SHORT).show()
-                            );
+                .setPositiveButton("Xóa", (d, i) -> {
+                    db.collection("contracts").whereEqualTo("roomId", room.getId()).get()
+                            .addOnSuccessListener(query -> {
+                                if (!query.isEmpty()) {
+                                    Toast.makeText(this, "Không thể xóa: Phòng đang có hợp đồng thuê!", Toast.LENGTH_LONG).show();
+                                } else {
+                                    db.collection("rooms").document(room.getId()).delete()
+                                            .addOnSuccessListener(a -> {
+                                                Toast.makeText(this, "Đã xóa phòng thành công", Toast.LENGTH_SHORT).show();
+                                                loadRoomsByStatus(currentFilter); // Giữ nguyên filter hiện tại
+                                            });
+                                }
+                            });
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
     }
-
 }

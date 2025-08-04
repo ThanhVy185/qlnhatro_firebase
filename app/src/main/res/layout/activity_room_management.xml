@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Hai nút Phòng / Người thuê -->
+    <!-- Thanh nút điều hướng -->
     <LinearLayout
         android:id="@+id/tabsLayout"
         android:layout_width="match_parent"
@@ -24,16 +24,47 @@
             android:textSize="20dp"
             android:textColor="@android:color/white"
             android:layout_marginTop="15dp"/>
-
-
     </LinearLayout>
+
+    <!-- Bộ lọc phòng -->
+    <RadioGroup
+        android:id="@+id/rgRoomFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tabsLayout"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp">
+
+        <RadioButton
+            android:id="@+id/rbAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tất cả"
+            android:checked="true"
+            app:buttonTint="@color/myCheckedColor"/>
+
+        <RadioButton
+            android:id="@+id/rbEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phòng trống"
+            app:buttonTint="@color/myCheckedColor"/>
+
+        <RadioButton
+            android:id="@+id/rbRented"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đã thuê"
+            app:buttonTint="@color/myCheckedColor"/>
+    </RadioGroup>
 
     <!-- RecyclerView hiển thị grid phòng -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRooms"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tabsLayout"
+        android:layout_below="@id/rgRoomFilter"
         android:layout_above="@+id/fabAddRoom"
         android:padding="8dp"/>
 
@@ -46,6 +77,6 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
         app:srcCompat="@drawable/ic_add"
-        android:tint="@android:color/white"/>
-
+        android:tint="@android:color/white"
+        android:backgroundTint="#B8FFB8"/>
 </RelativeLayout>

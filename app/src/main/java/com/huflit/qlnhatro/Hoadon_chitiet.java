@@ -92,16 +92,40 @@ public class Hoadon_chitiet extends AppCompatActivity {
         txtChiTietNuoc.setText(String.format(Locale.getDefault(), "(%.1f m³)", soNuoc));
     }
 
+//    private void handleEvents() {
+//        imgClose.setOnClickListener(v -> finish());
+//
+//        // Xử lý sự kiện khi nhấn vào trạng thái thanh toán
+//        txtTrangThaiThanhToan.setOnClickListener(v -> {
+//            String currentStatus = txtTrangThaiThanhToan.getText().toString();
+//            String newStatus = currentStatus.equals("Chưa thanh toán") ? "Đã thanh toán" : "Chưa thanh toán";
+//
+//            updatePaymentStatus(newStatus);
+//        });
+//    }
+
     private void handleEvents() {
         imgClose.setOnClickListener(v -> finish());
 
-        // Xử lý sự kiện khi nhấn vào trạng thái thanh toán
         txtTrangThaiThanhToan.setOnClickListener(v -> {
             String currentStatus = txtTrangThaiThanhToan.getText().toString();
             String newStatus = currentStatus.equals("Chưa thanh toán") ? "Đã thanh toán" : "Chưa thanh toán";
+
+            // Cập nhật trạng thái thanh toán
             updatePaymentStatus(newStatus);
+
+            // Đổi màu theo trạng thái
+            if (newStatus.equals("Đã thanh toán")) {
+                txtTrangThaiThanhToan.setBackgroundResource(R.drawable.bg_paid); // nền xanh nhạt
+                txtTrangThaiThanhToan.setTextColor(getResources().getColor(R.color.green_dark)); // chữ xanh đậm
+            } else {
+                txtTrangThaiThanhToan.setBackgroundResource(R.drawable.bg_unpaid); // nền đỏ nhạt
+                txtTrangThaiThanhToan.setTextColor(getResources().getColor(R.color.red_dark)); // chữ đỏ đậm
+            }
         });
     }
+
+
 
     private void updatePaymentStatus(String newStatus) {
         if (documentId == null || documentId.isEmpty()) {

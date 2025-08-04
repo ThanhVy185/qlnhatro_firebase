@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import Data.HoaDon;
 
@@ -91,24 +93,43 @@ public class ReportActivity extends AppCompatActivity {
      * Lấy dữ liệu về phòng: tổng số, đã thuê, còn trống.
      */
     private void fetchRoomStatistics() {
-        // 1. Lấy tổng số phòng
-        db.collection("rooms").get().addOnSuccessListener(roomsSnapshot -> {
-            int totalRooms = roomsSnapshot.size();
-            tvTotalRooms.setText(String.valueOf(totalRooms));
+        // B1: Lấy tất cả hợp đồng để gom roomId duy nhất
+        db.collection("contracts").get()
+                .addOnSuccessListener(contractsSnapshot -> {
+                    Set<String> rentedRoomIds = new HashSet<>();
+                    for (QueryDocumentSnapshot c : contractsSnapshot) {
+                        String roomId = c.getString("roomId");
+                        if (roomId != null) {
+                            rentedRoomIds.add(roomId); // chỉ giữ unique
+                        }
+                    }
 
-            // 2. Lấy số phòng đã thuê (dựa vào số hợp đồng)
-            db.collection("contracts").get().addOnSuccessListener(contractsSnapshot -> {
-                int rentedRooms = contractsSnapshot.size();
-                tvRentedRooms.setText(String.valueOf(rentedRooms));
+                    // B2: Lấy tất cả phòng và tính toán
+                    db.collection("rooms").get()
+                            .addOnSuccessListener(roomsSnapshot -> {
+                                int totalRooms = roomsSnapshot.size();
+                                int rentedCount = 0;
+                                int emptyCount = 0;
 
-                // 3. Tính số phòng còn trống
-                int availableRooms = totalRooms - rentedRooms;
-                tvAvailableRooms.setText(String.valueOf(availableRooms));
+                                for (QueryDocumentSnapshot r : roomsSnapshot) {
+                                    String roomId = r.getId();
+                                    if (rentedRoomIds.contains(roomId)) {
+                                        rentedCount++;
+                                    } else {
+                                        emptyCount++;
+                                    }
+                                }
 
-            }).addOnFailureListener(e -> Log.e("ReportActivity", "Lỗi khi lấy số hợp đồng: ", e));
-
-        }).addOnFailureListener(e -> Log.e("ReportActivity", "Lỗi khi lấy tổng số phòng: ", e));
+                                // B3: Gán vào TextView
+                                tvTotalRooms.setText(String.valueOf(totalRooms));
+                                tvRentedRooms.setText(String.valueOf(rentedCount));
+                                tvAvailableRooms.setText(String.valueOf(emptyCount));
+                            })
+                            .addOnFailureListener(e -> Log.e("ReportActivity", "Lỗi khi lấy phòng: ", e));
+                })
+                .addOnFailureListener(e -> Log.e("ReportActivity", "Lỗi khi lấy hợp đồng: ", e));
     }
+
 
     /**
      * Lấy tổng số hóa đơn đã được tạo.

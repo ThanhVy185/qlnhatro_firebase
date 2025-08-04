@@ -48,14 +48,15 @@
             android:scaleType="centerCrop"
             android:background="@color/gray_light"/>
 
+        <!-- Ngày tạo (read-only) -->
         <Button
             android:id="@+id/btnPickImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Chọn ảnh"
-            android:layout_marginTop="8dp"/>
+            android:backgroundTint="#79D57A"/>
 
-        <!-- Ngày tạo (read-only) -->
         <EditText
             android:id="@+id/etCreateDate"
             android:layout_width="match_parent"

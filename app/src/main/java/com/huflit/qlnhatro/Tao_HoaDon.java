@@ -117,27 +117,66 @@ public class Tao_HoaDon extends AppCompatActivity {
     }
 
     private void setupSpinner() {
-        db.collection("rooms").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.isEmpty()) {
-                Toast.makeText(this, "Không có dữ liệu phòng", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            roomList = new ArrayList<>();
-            ArrayList<String> roomDisplayList = new ArrayList<>();
-            for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                Room room = doc.toObject(Room.class);
-                if (room != null) {
-                    room.setId(doc.getId());
-                    roomList.add(room);
-                    roomDisplayList.add("Phòng " + room.getNumber());
+        // Lấy danh sách hợp đồng trước để biết phòng nào đang thuê
+        db.collection("contracts").get().addOnSuccessListener(contractSnapshots -> {
+            ArrayList<String> rentedRoomIds = new ArrayList<>();
+            for (DocumentSnapshot contractDoc : contractSnapshots) {
+                String roomId = contractDoc.getString("roomId");
+                if (roomId != null) {
+                    rentedRoomIds.add(roomId);
                 }
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_spinner_item, roomDisplayList);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerPhong.setAdapter(adapter);
+
+            // Lấy danh sách phòng
+            db.collection("rooms").get().addOnSuccessListener(roomSnapshots -> {
+                if (roomSnapshots.isEmpty()) {
+                    Toast.makeText(this, "Không có dữ liệu phòng", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                roomList = new ArrayList<>();
+                ArrayList<String> roomDisplayList = new ArrayList<>();
+
+                for (DocumentSnapshot doc : roomSnapshots) {
+                    Room room = doc.toObject(Room.class);
+                    if (room != null) {
+                        room.setId(doc.getId());
+                        // Chỉ thêm phòng nếu đang thuê (có trong danh sách hợp đồng)
+                        if (rentedRoomIds.contains(room.getId())) {
+                            roomList.add(room);
+                        }
+                    }
+                }
+
+                // Sắp xếp theo số phòng tăng dần
+                roomList.sort((a, b) -> {
+                    try {
+                        int na = Integer.parseInt(a.getNumber());
+                        int nb = Integer.parseInt(b.getNumber());
+                        return Integer.compare(na, nb);
+                    } catch (NumberFormatException e) {
+                        return a.getNumber().compareTo(b.getNumber());
+                    }
+                });
+
+                // Tạo danh sách hiển thị
+                for (Room r : roomList) {
+                    roomDisplayList.add("Phòng " + r.getNumber());
+                }
+
+                // Gán vào Spinner
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        roomDisplayList
+                );
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerPhong.setAdapter(adapter);
+
+            });
         });
     }
+
 
     private boolean validateInput() {
         if (spinnerPhong.getSelectedItem() == null) {

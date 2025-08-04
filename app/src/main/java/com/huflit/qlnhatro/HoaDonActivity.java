@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -53,8 +54,8 @@ public class HoaDonActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // <<< THAY ĐỔI: Gọi hàm để thêm dữ liệu mẫu >>>
-        addSampleData();
+//        // <<< THAY ĐỔI: Gọi hàm để thêm dữ liệu mẫu >>>
+//        addSampleData();
 
         // Ánh xạ các View
         bindViews();
@@ -166,51 +167,59 @@ public class HoaDonActivity extends AppCompatActivity {
             yearFilter = Integer.parseInt((String) spnFilterYear.getItemAtPosition(selectedYearPos));
         }
 
-        // Bắt đầu lọc
+        // Danh sách tạm lưu hóa đơn đã lọc
         ArrayList<HoaDon> tempFilteredList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
         for (HoaDon hd : fullHoaDonList) {
             // 1. Kiểm tra trạng thái
             boolean statusMatch = (statusFilter == null) || hd.getTrangThai().equalsIgnoreCase(statusFilter);
-
-            // Nếu trạng thái không khớp, bỏ qua và xét hóa đơn tiếp theo
-            if (!statusMatch) {
-                continue;
-            }
+            if (!statusMatch) continue;
 
             // 2. Kiểm tra ngày tháng năm
-            boolean dateMatch = (monthFilter == -1 && yearFilter == -1); // Mặc định khớp nếu không có bộ lọc ngày
-            if (!dateMatch) { // Chỉ kiểm tra nếu có chọn bộ lọc tháng hoặc năm
+            boolean dateMatch = (monthFilter == -1 && yearFilter == -1);
+            if (!dateMatch) {
                 try {
                     Date date = sdf.parse(hd.getNgayLap());
                     if (date != null) {
                         Calendar cal = Calendar.getInstance();
                         cal.setTime(date);
-                        // Điều kiện khớp khi: bộ lọc là "Tất cả" HOẶC giá trị khớp
+
                         boolean monthMatches = (monthFilter == -1) || (cal.get(Calendar.MONTH) + 1 == monthFilter);
                         boolean yearMatches = (yearFilter == -1) || (cal.get(Calendar.YEAR) == yearFilter);
+
                         if (monthMatches && yearMatches) {
                             dateMatch = true;
                         }
                     }
                 } catch (ParseException e) {
-                    dateMatch = false; // Nếu ngày không hợp lệ, coi như không khớp
+                    dateMatch = false;
                 }
             }
 
-            // Nếu cả hai điều kiện đều khớp, thêm vào danh sách hiển thị
             if (dateMatch) {
                 tempFilteredList.add(hd);
             }
         }
 
-        // Cập nhật danh sách hiển thị và ListView
+        // 🔹 Sắp xếp danh sách theo số phòng (1 → lớn nhất)
+        Collections.sort(tempFilteredList, (a, b) -> {
+            try {
+                int na = Integer.parseInt(a.getMaPhong().trim());
+                int nb = Integer.parseInt(b.getMaPhong().trim());
+                return Integer.compare(na, nb);
+            } catch (NumberFormatException e) {
+                return a.getMaPhong().compareTo(b.getMaPhong());
+            }
+        });
+
+        // Cập nhật danh sách hiển thị
         filteredHoaDonList.clear();
         filteredHoaDonList.addAll(tempFilteredList);
         hoaDonAdapter.notifyDataSetChanged();
-        selectedPosition = -1; // Reset lựa chọn
+        selectedPosition = -1;
     }
+
 
     private void setupEventListeners() {
         btnTaoMoi.setOnClickListener(v -> {
@@ -259,36 +268,36 @@ public class HoaDonActivity extends AppCompatActivity {
     /**
      * <<< HÀM ĐƯỢC CẬP NHẬT: Thêm dữ liệu mẫu dựa trên hình ảnh vào tháng 6 >>>
      */
-    private void addSampleData() {
-        // Dùng một mã phòng đặc biệt để kiểm tra xem dữ liệu đã được thêm chưa
-        db.collection("HoaDon").whereEqualTo("maPhong", "P-SAMPLE-TEST").limit(1).get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        // Nếu chưa có, tiến hành thêm dữ liệu mẫu
-                        WriteBatch batch = db.batch();
-                        ArrayList<HoaDon> sampleList = new ArrayList<>();
-
-                        // Dữ liệu từ hình ảnh, nhưng đổi ngày sang tháng 6
-
-                        sampleList.add(new HoaDon("10", "Sang", "0902223344", 2000000, 220000, 120000, "21/05/2025", "Chưa thanh toán", 65.0, 8.0));
-                        sampleList.add(new HoaDon("15", "Vy", "0903334455", 2000000, 190000, 90000, "25/05/2025", "Đã thanh toán", 55.0, 6.0));
-                        sampleList.add(new HoaDon("19", "Trang", "0904445566", 2000000, 250000, 130000, "09/05/2025", "Chưa thanh toán", 70.0, 9.0));
-
-                        for (HoaDon hoaDon : sampleList) {
-                            DocumentReference docRef = db.collection("HoaDon").document();
-                            batch.set(docRef, hoaDon);
-                        }
-                        batch.commit().addOnSuccessListener(aVoid -> {
-                            Toast.makeText(HoaDonActivity.this, "Đã thêm dữ liệu mẫu.", Toast.LENGTH_SHORT).show();
-                            // Tải lại dữ liệu sau khi thêm thành công
-                            loadAllInvoicesFromFirestore();
-                        }).addOnFailureListener(e -> {
-                            Log.e("HoaDonActivity", "Lỗi khi thêm dữ liệu mẫu: ", e);
-                        });
-                    }
-                    // Nếu đã có dữ liệu thì không làm gì cả
-                });
-    }
+//    private void addSampleData() {
+//        // Dùng một mã phòng đặc biệt để kiểm tra xem dữ liệu đã được thêm chưa
+//        db.collection("HoaDon").whereEqualTo("maPhong", "P-SAMPLE-TEST").limit(1).get()
+//                .addOnSuccessListener(queryDocumentSnapshots -> {
+//                    if (queryDocumentSnapshots.isEmpty()) {
+//                        // Nếu chưa có, tiến hành thêm dữ liệu mẫu
+//                        WriteBatch batch = db.batch();
+//                        ArrayList<HoaDon> sampleList = new ArrayList<>();
+//
+//                        // Dữ liệu từ hình ảnh, nhưng đổi ngày sang tháng 6
+//
+//                        sampleList.add(new HoaDon("10", "Sang", "0902223344", 2000000, 220000, 120000, "21/05/2025", "Chưa thanh toán", 65.0, 8.0));
+//                        sampleList.add(new HoaDon("15", "Vy", "0903334455", 2000000, 190000, 90000, "25/05/2025", "Đã thanh toán", 55.0, 6.0));
+//                        sampleList.add(new HoaDon("19", "Trang", "0904445566", 2000000, 250000, 130000, "09/05/2025", "Chưa thanh toán", 70.0, 9.0));
+//
+//                        for (HoaDon hoaDon : sampleList) {
+//                            DocumentReference docRef = db.collection("HoaDon").document();
+//                            batch.set(docRef, hoaDon);
+//                        }
+//                        batch.commit().addOnSuccessListener(aVoid -> {
+//                            Toast.makeText(HoaDonActivity.this, "Đã thêm dữ liệu mẫu.", Toast.LENGTH_SHORT).show();
+//                            // Tải lại dữ liệu sau khi thêm thành công
+//                            loadAllInvoicesFromFirestore();
+//                        }).addOnFailureListener(e -> {
+//                            Log.e("HoaDonActivity", "Lỗi khi thêm dữ liệu mẫu: ", e);
+//                        });
+//                    }
+//                    // Nếu đã có dữ liệu thì không làm gì cả
+//                });
+//    }
 
 
     private void deleteSelectedHoaDon() {

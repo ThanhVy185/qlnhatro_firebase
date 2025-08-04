@@ -216,7 +216,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Xem Doanh Thu Tháng" />
+            android:text="Xem Doanh Thu Tháng"
+            android:backgroundTint="#79D57A"/>
 
         <!-- Biểu đồ doanh thu theo tháng -->
         <com.github.mikephil.charting.charts.LineChart

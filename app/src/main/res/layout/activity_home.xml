@@ -23,7 +23,7 @@
     <!-- Grid layout for dashboard cards -->
     <TextView
         android:id="@+id/btnExit"
-        android:layout_width="64dp"
+        android:layout_width="wrap_content"
         android:layout_height="49dp"
         android:layout_marginEnd="16dp"
         android:background="?attr/selectableItemBackground"

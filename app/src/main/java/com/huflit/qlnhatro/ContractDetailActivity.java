@@ -110,7 +110,7 @@ public class ContractDetailActivity extends AppCompatActivity {
                             try (InputStream is = getContentResolver().openInputStream(imageUri)) {
                                 ivContractImage.setImageBitmap(BitmapFactory.decodeStream(is));
                             } catch (Exception e) {
-                                ivContractImage.setImageResource(R.drawable.phongngu); // mặc định là ảnh phòng ngủ
+                                ivContractImage.setImageResource(R.drawable.phongngu); // ảnh mặc định bạn muốn
                             }
                         } else {
                             Glide.with(this)
@@ -118,8 +118,10 @@ public class ContractDetailActivity extends AppCompatActivity {
                                     .centerCrop()
                                     .into(ivContractImage);
                         }
-                        ivContractImage.setOnClickListener(v -> showFullScreenImage(imageUri));
+                    } else {
+                        ivContractImage.setImageResource(R.drawable.phongngu); // ảnh mặc định bạn muốn
                     }
+
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Lỗi tải chi tiết: " + e.getMessage(),
